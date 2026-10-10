@@ -1,0 +1,1468 @@
+{
+  "input_files": {
+    "node_counts": "C:\\Users\\USER\\OneDrive\\문서\\카카오톡 받은 파일\\neo4j_query_table_data_2026-6-27.csv",
+    "node_properties": "C:\\Users\\USER\\OneDrive\\문서\\카카오톡 받은 파일\\neo4j_query_table_data_2026-6-27 (1).csv",
+    "relationships": "C:\\Users\\USER\\OneDrive\\문서\\카카오톡 받은 파일\\neo4j_query_table_data_2026-6-27 (2).csv"
+  },
+  "current_structure": {
+    "node_counts": {
+      "Alias": 103,
+      "Article": 634,
+      "ArticleChunk": 698,
+      "Champion": 138,
+      "Entity": 1458,
+      "Game": 555,
+      "League": 1,
+      "Match": 209,
+      "Player": 68,
+      "SourceEvidence": 3526,
+      "Team": 10,
+      "Tournament": 5
+    },
+    "props_by_label": {
+      "Alias": [
+        "name",
+        "alias_type",
+        "from_mysql",
+        "alias_id"
+      ],
+      "Article": [
+        "article_id",
+        "name",
+        "from_mysql",
+        "news_id",
+        "title",
+        "published_at",
+        "provider",
+        "byline",
+        "url"
+      ],
+      "ArticleChunk": [
+        "name",
+        "from_mysql",
+        "chunk_id",
+        "chunk_text"
+      ],
+      "Champion": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at",
+        "champion_id",
+        "champion_name"
+      ],
+      "Coach": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at"
+      ],
+      "Entity": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at"
+      ],
+      "Event": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at"
+      ],
+      "Game": [
+        "name",
+        "game_id",
+        "from_mysql",
+        "game_no",
+        "duration_seconds",
+        "external_game_id",
+        "patch"
+      ],
+      "GameEntity": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at"
+      ],
+      "Group": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at"
+      ],
+      "Item": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at"
+      ],
+      "League": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at",
+        "league_id",
+        "league_name",
+        "region",
+        "description"
+      ],
+      "Match": [
+        "name",
+        "match_id",
+        "from_mysql",
+        "match_date",
+        "match_format",
+        "match_stage",
+        "score_a",
+        "score_b"
+      ],
+      "Object": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at"
+      ],
+      "Objective": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at"
+      ],
+      "Player": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at",
+        "player_id",
+        "is_active",
+        "player_name",
+        "position"
+      ],
+      "Role": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at"
+      ],
+      "SourceEvidence": [
+        "name",
+        "evidence_id",
+        "from_mysql",
+        "target_table",
+        "target_id",
+        "evidence_text",
+        "confidence"
+      ],
+      "Spell": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at"
+      ],
+      "Stage": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at"
+      ],
+      "Structure": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at"
+      ],
+      "Team": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at",
+        "team_id",
+        "team_name",
+        "is_active",
+        "region"
+      ],
+      "Tournament": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at",
+        "tournament_id",
+        "tournament_name",
+        "season_year",
+        "split"
+      ],
+      "Venue": [
+        "canonical_name",
+        "entity_type",
+        "name",
+        "from_mysql",
+        "entity_id",
+        "created_at"
+      ]
+    },
+    "labels_by_layer": {
+      "source/evidence": [
+        "Alias",
+        "Article",
+        "ArticleChunk",
+        "SourceEvidence"
+      ],
+      "domain": [
+        "Champion",
+        "Game",
+        "League",
+        "Match",
+        "Player",
+        "Team",
+        "Tournament"
+      ],
+      "extracted/entity": [
+        "Coach",
+        "Entity",
+        "Event",
+        "GameEntity",
+        "Group",
+        "Item",
+        "Object",
+        "Objective",
+        "Role",
+        "Spell",
+        "Stage",
+        "Structure",
+        "Venue"
+      ]
+    },
+    "relations_by_layer": {
+      "article/evidence graph": [
+        {
+          "from_label": "Article",
+          "rel_type": "HAS_CHUNK",
+          "to_label": "ArticleChunk",
+          "rel_props": []
+        },
+        {
+          "from_label": "Article",
+          "rel_type": "HAS_EVIDENCE",
+          "to_label": "SourceEvidence",
+          "rel_props": []
+        },
+        {
+          "from_label": "ArticleChunk",
+          "rel_type": "SUPPORTS",
+          "to_label": "SourceEvidence",
+          "rel_props": []
+        },
+        {
+          "from_label": "Player",
+          "rel_type": "HAS_ALIAS",
+          "to_label": "Alias",
+          "rel_props": []
+        },
+        {
+          "from_label": "Team",
+          "rel_type": "HAS_ALIAS",
+          "to_label": "Alias",
+          "rel_props": []
+        }
+      ],
+      "global domain graph": [
+        {
+          "from_label": "Champion",
+          "rel_type": "PICKED_IN",
+          "to_label": "Game",
+          "rel_props": []
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "ANNOUNCED",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "BENCHED",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "CAPTURED",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "CAPTURED",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "COACHES",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "COACHES",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "COMPETES_WITH",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "DEFEATED",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "DEFEATED",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "DEFEATED_BY",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "IS_PART_OF",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "MEMBER_OF",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "MEMBER_OF",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "PARTICIPATED_IN",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "PARTICIPATED_IN",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "PLAYED",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "PLAYED",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "PLAYS_ROLE",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "PLAYS_ROLE",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "RE_SIGNED_WITH",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "STARTED_OVER",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "TRANSFERRED_TO",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "USED",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "USED",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Game",
+          "rel_type": "PART_OF_MATCH",
+          "to_label": "Match",
+          "rel_props": []
+        },
+        {
+          "from_label": "Match",
+          "rel_type": "PART_OF_TOURNAMENT",
+          "to_label": "Tournament",
+          "rel_props": []
+        },
+        {
+          "from_label": "Player",
+          "rel_type": "PICKED_CHAMPION",
+          "to_label": "Champion",
+          "rel_props": [
+            "game_id"
+          ]
+        },
+        {
+          "from_label": "Player",
+          "rel_type": "PLAYED_IN",
+          "to_label": "Game",
+          "rel_props": [
+            "team_id",
+            "champion_id",
+            "from_mysql",
+            "position",
+            "side",
+            "player_game_stat_id",
+            "kills",
+            "deaths",
+            "assists",
+            "cs",
+            "gold",
+            "damage_to_champions",
+            "vision_score",
+            "wards_placed",
+            "wards_killed"
+          ]
+        },
+        {
+          "from_label": "Team",
+          "rel_type": "PLAYED_GAME",
+          "to_label": "Game",
+          "rel_props": [
+            "side"
+          ]
+        },
+        {
+          "from_label": "Team",
+          "rel_type": "PLAYED_MATCH",
+          "to_label": "Match",
+          "rel_props": [
+            "side"
+          ]
+        },
+        {
+          "from_label": "Team",
+          "rel_type": "TEAM_GAME_STAT",
+          "to_label": "Game",
+          "rel_props": [
+            "from_mysql",
+            "team_game_stat_id",
+            "total_kills",
+            "total_deaths",
+            "dragons",
+            "barons",
+            "towers",
+            "total_gold",
+            "void_grubs",
+            "atakhans",
+            "heralds",
+            "inhibitors",
+            "first_dragon",
+            "first_baron",
+            "first_tower"
+          ]
+        },
+        {
+          "from_label": "Team",
+          "rel_type": "WON_GAME",
+          "to_label": "Game",
+          "rel_props": []
+        },
+        {
+          "from_label": "Team",
+          "rel_type": "WON_MATCH",
+          "to_label": "Match",
+          "rel_props": []
+        },
+        {
+          "from_label": "Tournament",
+          "rel_type": "BELONGS_TO_LEAGUE",
+          "to_label": "League",
+          "rel_props": []
+        }
+      ],
+      "low-signal helper graph": [
+        {
+          "from_label": "Entity",
+          "rel_type": "MENTIONED_WITH",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "MENTIONED_WITH",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "RELATED_TO",
+          "to_label": "Entity",
+          "rel_props": [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "SAME_AS",
+          "to_label": "Entity",
+          "rel_props": []
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "SAME_AS",
+          "to_label": "League",
+          "rel_props": []
+        },
+        {
+          "from_label": "Entity",
+          "rel_type": "SAME_AS",
+          "to_label": "Team",
+          "rel_props": []
+        }
+      ]
+    }
+  },
+  "cleanup_candidates": {
+    "duplicate_label_shapes": [
+      {
+        "labels": [
+          "Coach",
+          "Entity",
+          "Event",
+          "GameEntity",
+          "Group",
+          "Item",
+          "Object",
+          "Objective",
+          "Role",
+          "Spell",
+          "Stage",
+          "Structure",
+          "Venue"
+        ],
+        "shared_properties": [
+          "canonical_name",
+          "created_at",
+          "entity_id",
+          "entity_type",
+          "from_mysql",
+          "name"
+        ]
+      }
+    ],
+    "duplicate_relation_patterns": [
+      {
+        "from_label": "Entity",
+        "rel_type": "CAPTURED",
+        "to_label": "Entity",
+        "property_shapes": [
+          [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ],
+          [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        ]
+      },
+      {
+        "from_label": "Entity",
+        "rel_type": "COACHES",
+        "to_label": "Entity",
+        "property_shapes": [
+          [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ],
+          [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        ]
+      },
+      {
+        "from_label": "Entity",
+        "rel_type": "DEFEATED",
+        "to_label": "Entity",
+        "property_shapes": [
+          [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ],
+          [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        ]
+      },
+      {
+        "from_label": "Entity",
+        "rel_type": "MEMBER_OF",
+        "to_label": "Entity",
+        "property_shapes": [
+          [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ],
+          [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        ]
+      },
+      {
+        "from_label": "Entity",
+        "rel_type": "MENTIONED_WITH",
+        "to_label": "Entity",
+        "property_shapes": [
+          [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ],
+          [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        ]
+      },
+      {
+        "from_label": "Entity",
+        "rel_type": "PARTICIPATED_IN",
+        "to_label": "Entity",
+        "property_shapes": [
+          [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ],
+          [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        ]
+      },
+      {
+        "from_label": "Entity",
+        "rel_type": "PLAYED",
+        "to_label": "Entity",
+        "property_shapes": [
+          [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ],
+          [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        ]
+      },
+      {
+        "from_label": "Entity",
+        "rel_type": "PLAYS_ROLE",
+        "to_label": "Entity",
+        "property_shapes": [
+          [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ],
+          [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        ]
+      },
+      {
+        "from_label": "Entity",
+        "rel_type": "USED",
+        "to_label": "Entity",
+        "property_shapes": [
+          [
+            "article_id",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ],
+          [
+            "article_id",
+            "source_original",
+            "target_original",
+            "source_matched_alias",
+            "target_matched_alias",
+            "from_mysql",
+            "raw_relation_type",
+            "created_at",
+            "relation_id"
+          ]
+        ]
+      }
+    ],
+    "overloaded_relation_types": [
+      {
+        "rel_type": "SAME_AS",
+        "label_pairs": [
+          {
+            "from_label": "Entity",
+            "to_label": "Entity"
+          },
+          {
+            "from_label": "Entity",
+            "to_label": "League"
+          },
+          {
+            "from_label": "Entity",
+            "to_label": "Team"
+          }
+        ]
+      },
+      {
+        "rel_type": "HAS_ALIAS",
+        "label_pairs": [
+          {
+            "from_label": "Player",
+            "to_label": "Alias"
+          },
+          {
+            "from_label": "Team",
+            "to_label": "Alias"
+          }
+        ]
+      }
+    ],
+    "low_signal_relations": [
+      {
+        "from_label": "Article",
+        "rel_type": "HAS_CHUNK",
+        "to_label": "ArticleChunk"
+      },
+      {
+        "from_label": "Article",
+        "rel_type": "HAS_EVIDENCE",
+        "to_label": "SourceEvidence"
+      },
+      {
+        "from_label": "ArticleChunk",
+        "rel_type": "SUPPORTS",
+        "to_label": "SourceEvidence"
+      },
+      {
+        "from_label": "Entity",
+        "rel_type": "MENTIONED_WITH",
+        "to_label": "Entity"
+      },
+      {
+        "from_label": "Entity",
+        "rel_type": "MENTIONED_WITH",
+        "to_label": "Entity"
+      },
+      {
+        "from_label": "Entity",
+        "rel_type": "RELATED_TO",
+        "to_label": "Entity"
+      },
+      {
+        "from_label": "Entity",
+        "rel_type": "SAME_AS",
+        "to_label": "Entity"
+      },
+      {
+        "from_label": "Entity",
+        "rel_type": "SAME_AS",
+        "to_label": "League"
+      },
+      {
+        "from_label": "Entity",
+        "rel_type": "SAME_AS",
+        "to_label": "Team"
+      },
+      {
+        "from_label": "Player",
+        "rel_type": "HAS_ALIAS",
+        "to_label": "Alias"
+      },
+      {
+        "from_label": "Team",
+        "rel_type": "HAS_ALIAS",
+        "to_label": "Alias"
+      }
+    ],
+    "entity_to_entity_relation_types": {
+      "ANNOUNCED": 1,
+      "BENCHED": 1,
+      "CAPTURED": 2,
+      "COACHES": 2,
+      "COMPETES_WITH": 1,
+      "DEFEATED": 2,
+      "DEFEATED_BY": 1,
+      "IS_PART_OF": 1,
+      "MEMBER_OF": 2,
+      "MENTIONED_WITH": 2,
+      "PARTICIPATED_IN": 2,
+      "PLAYED": 2,
+      "PLAYS_ROLE": 2,
+      "RELATED_TO": 1,
+      "RE_SIGNED_WITH": 1,
+      "SAME_AS": 1,
+      "STARTED_OVER": 1,
+      "TRANSFERRED_TO": 1,
+      "USED": 2
+    }
+  },
+  "normalization_criteria": {
+    "canonical_property_priority": [
+      "canonical_name",
+      "team_name",
+      "player_name",
+      "champion_name",
+      "tournament_name",
+      "league_name",
+      "name"
+    ],
+    "criteria": [
+      {
+        "target": "Team",
+        "identity": [
+          "team_id",
+          "team_name",
+          "canonical_name",
+          "name"
+        ],
+        "sources": [
+          "Team",
+          "Entity",
+          "Alias"
+        ],
+        "rule": "팀 alias나 canonical_name이 Team.team_name/name과 일치하면 Team으로 승격한다."
+      },
+      {
+        "target": "Player",
+        "identity": [
+          "player_id",
+          "player_name",
+          "canonical_name",
+          "name"
+        ],
+        "sources": [
+          "Player",
+          "Entity",
+          "Alias"
+        ],
+        "rule": "선수 alias, 실명, canonical_name이 Player 이름과 일치하면 Player로 승격한다."
+      },
+      {
+        "target": "Champion",
+        "identity": [
+          "champion_id",
+          "champion_name",
+          "canonical_name",
+          "name"
+        ],
+        "sources": [
+          "Champion",
+          "Entity",
+          "Alias"
+        ],
+        "rule": "챔피언 이름과 alias가 일치하면 Champion으로 승격한다."
+      },
+      {
+        "target": "Tournament",
+        "identity": [
+          "tournament_id",
+          "tournament_name",
+          "canonical_name",
+          "name"
+        ],
+        "sources": [
+          "Tournament",
+          "Entity"
+        ],
+        "rule": "시즌/스플릿/대회명이 들어간 엔티티는 Tournament로 승격한다."
+      }
+    ],
+    "relation_hints": [
+      {
+        "rel_type": "MEMBER_OF",
+        "source_label": "Player",
+        "target_label": "Team"
+      },
+      {
+        "rel_type": "COACHES",
+        "source_label": "Coach",
+        "target_label": "Team"
+      },
+      {
+        "rel_type": "PICKED_CHAMPION",
+        "source_label": "Player",
+        "target_label": "Champion"
+      },
+      {
+        "rel_type": "PICKED_IN",
+        "source_label": "Champion",
+        "target_label": "Game"
+      },
+      {
+        "rel_type": "PLAYED_IN",
+        "source_label": "Player",
+        "target_label": "Game"
+      },
+      {
+        "rel_type": "PLAYED_GAME",
+        "source_label": "Team",
+        "target_label": "Game"
+      },
+      {
+        "rel_type": "PLAYED_MATCH",
+        "source_label": "Team",
+        "target_label": "Match"
+      },
+      {
+        "rel_type": "WON_GAME",
+        "source_label": "Team",
+        "target_label": "Game"
+      },
+      {
+        "rel_type": "WON_MATCH",
+        "source_label": "Team",
+        "target_label": "Match"
+      },
+      {
+        "rel_type": "PART_OF_MATCH",
+        "source_label": "Game",
+        "target_label": "Match"
+      },
+      {
+        "rel_type": "PART_OF_TOURNAMENT",
+        "source_label": "Match",
+        "target_label": "Tournament"
+      },
+      {
+        "rel_type": "BELONGS_TO_LEAGUE",
+        "source_label": "Tournament",
+        "target_label": "League"
+      }
+    ],
+    "observed_normalization_targets": [
+      "Champion",
+      "Coach",
+      "Game",
+      "League",
+      "Match",
+      "Objective",
+      "Player",
+      "Role",
+      "Team",
+      "Tournament"
+    ]
+  },
+  "graph_separation_design": {
+    "article_graph": {
+      "purpose": "관계가 어느 기사/청크에서 나왔는지 추적하는 근거 그래프",
+      "labels": [
+        "Alias",
+        "Article",
+        "ArticleChunk",
+        "SourceEvidence"
+      ],
+      "main_relations": [
+        "Article-[:HAS_CHUNK]->ArticleChunk",
+        "Article-[:HAS_EVIDENCE]->SourceEvidence",
+        "ArticleChunk-[:SUPPORTS]->SourceEvidence"
+      ],
+      "query_use": "출처 확인, 특정 기사별 관계 확인, 답변 근거 표시"
+    },
+    "global_graph": {
+      "purpose": "정규화된 LCK 도메인 지식그래프",
+      "labels": [
+        "Champion",
+        "Coach",
+        "Entity",
+        "Event",
+        "Game",
+        "GameEntity",
+        "Group",
+        "Item",
+        "League",
+        "Match",
+        "Object",
+        "Objective",
+        "Player",
+        "Role",
+        "Spell",
+        "Stage",
+        "Structure",
+        "Team",
+        "Tournament",
+        "Venue"
+      ],
+      "main_relations": [
+        "Team/Player/Champion/Match/Game/Tournament 중심의 정규화 관계",
+        "관계 속성에 article_id, confidence, raw_relation_type 보존"
+      ],
+      "query_use": "선수/팀/대회 중심 Local Search"
+    },
+    "community_summary_graph": {
+      "purpose": "여러 기사에서 반복되는 관계 묶음을 요약한 상위 그래프",
+      "labels": [
+        "Community",
+        "CommunitySummary"
+      ],
+      "main_relations": [
+        "CONTAINS_ENTITY",
+        "SUPPORTED_BY",
+        "SUMMARIZES",
+        "PART_OF_COMMUNITY"
+      ],
+      "query_use": "전체 이슈/흐름 질문 Global Search"
+    }
+  },
+  "community_summary_plan": {
+    "new_nodes": {
+      "Community": [
+        "community_id",
+        "title",
+        "summary",
+        "level",
+        "entity_count",
+        "article_count",
+        "created_at"
+      ],
+      "CommunitySummary": [
+        "summary_id",
+        "community_id",
+        "summary",
+        "source",
+        "created_at"
+      ]
+    },
+    "connect_to": {
+      "entities": [
+        "Champion",
+        "Coach",
+        "Entity",
+        "Event",
+        "Game",
+        "GameEntity",
+        "Group",
+        "Item",
+        "League",
+        "Match",
+        "Object",
+        "Objective",
+        "Player",
+        "Role",
+        "Spell",
+        "Stage",
+        "Structure",
+        "Team",
+        "Tournament",
+        "Venue"
+      ],
+      "evidence": [
+        "ArticleChunk",
+        "SourceEvidence",
+        "Article"
+      ]
+    },
+    "recommended_relations": [
+      "Community-[:CONTAINS_ENTITY {weight, rank}]->Entity/Team/Player/Champion",
+      "Community-[:SUPPORTED_BY]->ArticleChunk",
+      "Community-[:SUMMARIZES]->CommunitySummary",
+      "Community-[:PART_OF_COMMUNITY]->Community"
+    ],
+    "build_order": [
+      "정규화된 global graph에서 커뮤니티 탐지 결과를 만든다.",
+      "community_id별 핵심 Entity와 관련 ArticleChunk를 모은다.",
+      "LLM으로 community summary를 생성한다.",
+      "Community와 CommunitySummary 노드를 Neo4j에 저장한다."
+    ]
+  },
+  "cypher_templates": {
+    "constraints": [
+      "CREATE CONSTRAINT article_id IF NOT EXISTS FOR (n:Article) REQUIRE n.article_id IS UNIQUE;",
+      "CREATE CONSTRAINT chunk_id IF NOT EXISTS FOR (n:ArticleChunk) REQUIRE n.chunk_id IS UNIQUE;",
+      "CREATE CONSTRAINT team_id IF NOT EXISTS FOR (n:Team) REQUIRE n.team_id IS UNIQUE;",
+      "CREATE CONSTRAINT player_id IF NOT EXISTS FOR (n:Player) REQUIRE n.player_id IS UNIQUE;",
+      "CREATE CONSTRAINT champion_id IF NOT EXISTS FOR (n:Champion) REQUIRE n.champion_id IS UNIQUE;",
+      "CREATE CONSTRAINT community_id IF NOT EXISTS FOR (n:Community) REQUIRE n.community_id IS UNIQUE;"
+    ],
+    "promote_entity_to_domain_label": [
+      "// Team 부분을 Player, Champion 등 목표 라벨로 바꿔서 사용한다.",
+      "MATCH (e:Entity {canonical_name: $canonical_name})",
+      "SET e:Team",
+      "SET e.normalized_from_entity = true"
+    ],
+    "create_community": [
+      "MERGE (c:Community {community_id: $community_id})",
+      "SET c.title = $title,",
+      "    c.summary = $summary,",
+      "    c.level = $level,",
+      "    c.entity_count = $entity_count,",
+      "    c.article_count = $article_count,",
+      "    c.created_at = datetime()"
+    ],
+    "link_community_entity": [
+      "MATCH (c:Community {community_id: $community_id})",
+      "MATCH (e {canonical_name: $canonical_name})",
+      "MERGE (c)-[r:CONTAINS_ENTITY]->(e)",
+      "SET r.weight = $weight, r.rank = $rank"
+    ],
+    "link_community_evidence": [
+      "MATCH (c:Community {community_id: $community_id})",
+      "MATCH (chunk:ArticleChunk {chunk_id: $chunk_id})",
+      "MERGE (c)-[:SUPPORTED_BY]->(chunk)"
+    ]
+  }
+}

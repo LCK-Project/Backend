@@ -1,0 +1,840 @@
+﻿alias,canonical,type
+젠지,GenG,Team
+GenG,GenG,Team
+티원,T1,Team
+슼,T1, Team
+SKT T1,T1, Team
+T1,T1, Team
+한화,한화생명e스포츠, Team
+한화생명,한화생명e스포츠, Team
+한생,한화생명e스포츠, Team
+HLE,한화생명e스포츠, Team
+한화생명 e스포츠,한화생명e스포츠, Team
+KT 롤스터,KT 롤스터, Team
+KT,KT 롤스터, Team
+킅,KT 롤스터, Team
+광동,광동 프릭스, Team
+광동 프릭스,광동 프릭스, Team
+DN프릭스,광동 프릭스, Team
+DN 프릭스,광동 프릭스, Team
+DNF,광동 프릭스, Team
+DN SOOPers,광동 프릭스, Team
+BNK FEARX,BNK 피어엑스, Team
+BNKFEARX,BNK 피어엑스, Team
+BFX,BNK 피어엑스,Team
+BNK피어엑스,BNK 피어엑스,Team
+BNK 피어엑스,BNK 피어엑스,Team
+농심 레드포스,농심 레드포스,Team
+농심,농심 레드포스,Team
+NS,농심 레드포스,Team
+NS REDFORCE,농심 레드포스,Team
+NS RedForce,농심 레드포스,Team
+DRX,DRX,Team
+딮,DRX, Team
+디알엑스,DRX, Team
+DK,디플러스 기아,Team
+디플러스기아,디플러스 기아,Team
+디플러스 기아,디플러스 기아,Team
+Dplus KIA,디플러스 기아,Team
+담원,디플러스 기아,Team
+담원 기아,디플러스 기아,Team
+딮기,디플러스 기아, Team
+BRO,OK 저축은행 브리온,Team
+OK 저축은행 브리온,OK 저축은행 브리온,Team
+브리온,OK 저축은행 브리온,Team
+OK 저축은행,OK 저축은행 브리온,Team
+--------------젠지-------------,,
+김기인,기인,Player
+기인,기인,Player
+김건부,캐니언,Player
+캐니언,캐니언,Player
+정지훈,'쵸비' 정지훈,player
+쵸비,'쵸비' 정지훈,player
+박재혁,룰러,Player
+룰러,룰러,Player
+주민규,듀로,Player
+듀로,듀로,Player
+김정수,김정수,Head Coach
+권영재,권영재,Coach
+----------------티원---------------,,
+최현준,도란,Player
+도란,도란,Player
+문현준,오너,Player
+오너,오너,Player
+이상혁,페이커,Player
+페이커,페이커,Player
+이민형,구마유시,Player
+구마유시,구마유시,Player
+류민석,케리아,Player
+케리아,케리아,Player
+김정균,꼬마,HeadCoach
+꼬마,꼬마,HeadCoach
+임재현,톰,Coach
+톰,톰,Coach
+조세형,마타,Coach
+마타,마타,Coach
+--------------------한화생명--------------,,
+최우제,제우스,Player
+제우스,제우스,Player
+한왕호,한왕호,Player
+피넛,한왕호,Player
+김건우,제카,Player
+제카,제카,Player
+박도현,바이퍼,Player
+바이퍼,바이퍼,Player
+유환중,딜라이트,Player
+딜라이트,딜라이트,Player
+최인규,댄디,HeadCoach
+댄디,댄디,HeadCoach
+이재하,모글리,Coach
+모글리,모글리,Coach
+----------------DNF--------------------,,
+이동주,두두,Player
+두두,두두,Player
+홍창현,표식,Player
+표식,표식,Player
+이태영,불독,Player
+불독,불독,Player
+김민철,버서커,Player
+버서커,버서커,Player
+김정민,라이프,Player
+라이프,라이프,Player
+정민성,빠별,HeadCoach
+래피드스타,빠별,HeadCoach
+빠른별,빠별,HeadCoach
+빠별,빠별,HeadCoach
+정명훈,판타지,Coach
+판타지,판타지,Coach
+손민혁,펀치,Coach
+펀치,펀치,Coach
+양현민,미닛,Coach
+미닛,미닛,Coach
+김창성,큐브,Coach
+큐브,큐브,Coach
+-------------------KT-----------------,,
+이승민,퍼펙트,Player
+퍼펙트,퍼펙트,Player
+문우찬,커즈,Player
+커즈,커즈,Player
+곽보성,비디디,Player
+비디디,비디디,Player
+서대길,덕담,Player
+덕담,덕담,Player
+한길,웨이,Player
+웨이,웨이,Player
+고동빈,스코어,HeadCoach
+스코어,스코어,HeadCoach
+김무성,김무성,Coach
+전호진,라일락,Coach
+라일락,라일락,Coach
+-----------------BFX----------------,,
+송현민,클리어,Player
+클리어,클리어,Player
+전어진,랩터,Player
+랩터,랩터,Player
+이대광,빅라,Player
+빅라,빅라,Player
+남대근,디아블,Player
+디아블,디아블,Player
+김형규,켈린,Player
+켈린,켈린,Player
+류상욱,유상욱,HeadCoach
+류,유상욱,HeadCoach
+조재읍,조커,Coach
+조커,조커,Coach
+---------------------NS------------------,,
+황성훈,킹겐,Player
+킹겐,킹겐,Player
+김민성,기드온,Player
+기드온,기드온,Player
+이정태,피셔,Player
+피셔,피셔,Player
+정지우,지우,Player
+지우,지우,Player
+손시우,리헨즈,Player
+리헨즈,리헨즈,Player
+박승진,첼리,HeadCoach
+첼리,첼리,HeadCoach
+김태양,썬,Coach
+썬,썬,Coach
+김재희,크레이지,Coach
+크레이지,크레이지,Coach
+김기범,보노,Coach
+보노,보노,Coach
+김진영,던,Coach
+던,던,Coach
+--------------------drx--------------------,,
+이재원,리치,Player
+리치,리치,Player
+배영준,스펀지,Player
+스펀지,스펀지,Player
+손우현,유칼,Player
+유칼,유칼,Player
+박진성,테디,Player
+테디,테디,Player
+문관빈,안딜,Player
+엔딜,안딜,Player
+김상수,쏭,HeadCoach
+쏭,쏭,HeadCoach
+SSONG,쏭, HeadCoach
+김태일,프로즌,HeadCoach
+프로즌,프로즌,HeadCoach
+이종원,사루,Coach
+사루,사루,Coach
+노진욱,얼라이브,Coach
+얼라이브,얼라이브,Coach
+------------------bro--------------------,,
+박루한,모건,Player
+모건,모건,Player
+함유진,함박,Player
+함박,함박,Player
+이주현,클로저,Player
+클로저,클로저,Player
+변정현,하이프,Player
+하이프,하이프,Player
+오동규,폴루,Player
+폴루,폴루,Player
+최우범,에드가,HeadCoach
+에드가,에드가,HeadCoach
+김도엽,구거,Coach
+구거,구거,Coach
+이승후,드링커,Coach
+드링커,드링커,Coach
+------------dk-------------,,
+전시우,시우,Player
+시우,시우,Player
+최용혁,루시드,Player
+루시드,루시드,Player
+허수,쇼메이커,Player
+쇼메이커,쇼메이커,Player
+김하람,에이밍,Player
+에이밍,에이밍,Player
+조건희,베릴,Player
+베릴,베릴,Player
+배성웅,벵기,HeadCoach
+벵기,벵기,HeadCoach
+윤설,바이블,HeadCoach
+바이블,바이블,HeadCoach
+BIBLE,바이블, HeadCoach
+이정현,푸만두,Coach
+푸만두,푸만두,Coach
+하승찬,하차니,Coach
+하차니,하차니,Coach
+고성민,성민,Coach
+성민,성민,Coach
+-----오브젝트-----,,
+alias,canonical, type
+칼날부리,칼날부리, object
+칼부,칼날부리,object
+늑대,늑대,object
+어스름 늑대,늑대,object
+돌거북,돌거북,object
+거북,돌거북,object
+두꺼비,두꺼비,object
+심술두꺼비,두꺼비,object
+심술 두꺼비,두꺼비,object
+협곡 바위 게,협곡 바위 게,object
+협곡바위 게,협곡 바위 게,object
+협곡 바위게,협곡 바위 게,object
+협곡바위게,협곡 바위 게,object
+바위 게,협곡 바위 게,object
+바위게,협곡 바위 게,object
+푸른 파수꾼,푸른 파수꾼,object
+푸른파수꾼,푸른 파수꾼,object
+블루,푸른 파수꾼,object
+블루 버프,블루 버프,object
+블루버프,블루 버프,object
+붉은 덩굴 정령,붉은 덩굴 정령,object
+붉은덩굴 정령,붉은 덩굴 정령,object
+붉은 덩굴정령,붉은 덩굴 정령,object
+붉은덩굴정령,붉은 덩굴 정령,object
+레드,붉은 덩굴 정령,object
+레드 버프,레드 버프,object
+레드버프,레드 버프,object
+공허 유충,공허 유충,object
+유충,공허 유충,object
+드래곤,드래곤,object
+용,드래곤,object
+바람 드래곤,바람 드래곤,object
+바람드래곤,바람 드래곤,object
+바람 용,바람 드래곤,object
+바람용,바람 드래곤,object
+대지 드래곤,대지 드래곤,object
+대지드래곤,대지 드래곤,object
+대지 용,대지 드래곤,object
+대지용,대지 드래곤,object
+화염 드래곤,화염 드래곤, object
+화염드래곤,화염 드래곤, object
+화염 용,화염 드래곤, object
+화염용,화염 드래곤, object
+바다 드래곤,바다 드래곤,object
+바다드래곤,바다 드래곤,object
+바다 용,바다 드래곤, object
+바다용,바다 드래곤, object
+마법공학 드래곤,마법공학 드래곤,object
+마법공학드래곤,마법공학 드래곤,object
+마법공학용,마법공학 드래곤,object
+마법공학 용,마법공학 드래곤,object
+마공 드래곤,마법공학 드래곤,object
+마공용,마법공학 드래곤,object
+마공드래곤,마법공학 드래곤,object
+마공 용,마법공학 드래곤,object
+화학공학 드래곤,화학공학 드래곤,object
+화학공학드래곤,화학공학 드래곤,object
+화학공학 용,화학공학 드래곤,object
+화학공학용,화학공학 드래곤,object
+화공드래곤,화학공학 드래곤,object
+화공 드래곤,화학공학 드래곤,object
+화공 용,화학공학 드래곤,object
+화학용,화학공학 드래곤,object
+장로드래곤,장로드래곤,object
+장로 드래곤,장로드래곤,object
+장로 용,장로드래곤,object
+장로용,장로드래곤,object
+장로용,장로드래곤,object
+장로,장로드래곤,object
+협곡의 전령,협곡의 전령,object
+전령,협곡의 전령,object
+아타칸,아타칸,Objective
+고통의 아타칸,아타칸,Objective
+탐식의 아타칸,탐식의 아타칸,object
+레드 팀,레드 팀,set_position
+레드진영,레드 팀,set_position
+블루 팀,블루 팀,set_position
+블루진영,블루 팀,set_position
+바론,바론,Objective
+내셔 남작,바론,Objective
+내셔남작,바론,Objective
+-------포지션-------,,
+alias,canonical,type
+탑,탑,Role
+탑라이너,탑,Role
+탑라인,탑,Role
+정글,정글,Role
+정글러,정글,Role
+미드,미드,Role
+미드라이너,미드,Role
+미드라인,미드,Role
+미드 라인,미드,Role
+원딜,원딜,Role
+원거리 딜러,원딜,Role
+바텀,바텀,Role
+봇,바텀,Role
+바텀라인,바텀,Role
+서폿,서폿,Role
+서포터,서폿,Role
+------스펠--------,,
+alias,canonical,type
+점멸,점멸,Spell
+플래시,점멸,Spell
+플,점멸,Spell
+순간이동,순간이동,Spell
+텔포,순간이동,Spell
+텔,순간이동,Spell
+티피,순간이동,Spell
+TP,순간이동,Spell
+강타,강타,Spell
+스마이트,강타,Spell
+스마,강타,Spell
+점화,점화,Spell
+이그나이트,점화,Spell
+회복,회복,Spell
+힐,회복,Spell
+유체화,유체화,Spell
+고스트,유체화,Spell
+방어막,방어막,Spell
+배리어,방어막,Spell
+배리어,방어막,Spell
+탈진,탈진,Spell
+이그저스트,탈진,Spell
+익저,탈진,Spell
+정화,정화,Spell
+클린즈,정화,Spell
+총명,총명,Spell
+---------구조물----------,,
+alias,canonical,type
+포탑,포탑,Structure
+타워,포탑,Structure
+1차 포탑,1차 포탑,Structure
+1차 타워,1차 포탑,Structure
+외곽 포탑,1차 포탑,Structure
+외곽 타워,1차 포탑,Structure
+2차 포탑,2차 포탑,Structure
+2차 타워,2차 포탑,Structure
+내곽 포탑,2차 포탑,Structure
+내곽 타워,2차 포탑,Structure
+내부 포탑,2차 포탑,Structure
+내부 타워,2차 포탑,Structure
+3차 포탑,3차 포탑,Structure
+3차 타워,3차 포탑,Structure
+억제기 포탑,3차 포탑,Structure
+억제기 타워,3차 포탑,Structure
+쌍둥이 포탑,쌍둥이 포탑,Structure
+쌍둥이 타워,쌍둥이 포탑,Structure
+쌍둥이,쌍둥이 포탑,Structure
+4차 포탑,쌍둥이 포탑,Structure
+4차 타워,쌍둥이 포탑,Structure
+넥서스 포탑,쌍둥이 포탑,Structure
+넥서스 타워,쌍둥이 포탑,Structure
+억제기,억제기,Structure
+인히비터,억제기,Structure
+넥서스,넥서스,Structure
+우물,우물,Structure
+소환사의 제단,우물,Structure
+우물 포탑,우물 포탑, Structure
+넥서스 오벨리스크,우물 포탑, Structure
+수풀,수풀,Object
+부쉬,수풀,Object
+부시,수풀,Object
+솔방울탄,솔방울탄,Plant
+솔방울,솔방울탄,Plant
+수정초,수정초,Plant
+꿀열매,꿀열매,Plant
+피의 장미,피의 장미, Plant
+— season – ,,
+정규리그,정규리그,Stage
+플레이오프,플레이오프,Stage
+레전드그룹,레전드그룹,Group
+라이즈그룹,라이즈그룹,Group
+-----------챔피언------------------,,
+가렌,가렌,Champion
+갈리오,갈리오,Champion
+갱플랭크,갱플랭크,Champion
+갱플,갱플랭크,Champion
+그라가스,그라가스,Champion
+글가,그라가스,Champion
+그레이브즈,그레이브즈,Champion
+그브,그레이브즈,Champion
+그웬,그웬,Champion
+나르,나르,Champion
+나미,나미,Champion
+나서스,나서스,Champion
+나피리,나피리,Champion
+노틸러스,노틸러스,Champion
+노틸,노틸러스,Champion
+녹턴,녹턴,Champion
+누누와 윌럼프,누누와 윌럼프,Champion
+누누,누누와 윌럼프,Champion
+니달리,니달리,Champion
+니코,니코,Champion
+닐라,닐라,Champion
+다리우스,다리우스,Champion
+다리,다리우스,Champion
+다이애나,다이애나,Champion
+드레이븐,드레이븐,Champion
+드븐,드레이븐,Champion
+라이즈,라이즈,Champion
+라칸,라칸,Champion
+람머스,람머스,Champion
+럭스,럭스,Champion
+럼블,럼블,Champion
+레나타 글라스크,레나타 글라스크,Champion
+레나타,레나타 글라스크,Champion
+레넥톤,레넥톤,Champion
+레넥,레넥톤,Champion
+레오나,레오나,Champion
+렉사이,렉사이,Champion
+렐,렐,Champion
+렝가,렝가,Champion
+루시안,루시안,Champion
+룰루,룰루,Champion
+르블랑,르블랑,Champion
+블랑,르블랑,Champion
+리 신,리 신,Champion
+리신,리 신,Champion
+리븐,리븐,Champion
+리산드라,리산드라,Champion
+리산,리산드라,Champion
+릴리아,릴리아,Champion
+마스터 이,마스터 이,Champion
+마스터이,마스터 이,Champion
+마이,마스터 이,Champion
+마오카이,마오카이,Champion
+마오,마오카이,Champion
+말자하,말자하,Champion
+말파이트,말파이트,Champion
+말파,말파이트,Champion
+모데카이저,모데카이저,Champion
+모데,모데카이저,Champion
+모르가나,모르가나,Champion
+몰가,모르가나,Champion
+밀리오,밀리오,Champion
+바드,바드,Champion
+바루스,바루스,Champion
+바이,바이,Champion
+베이가,베이가,Champion
+베인,베인,Champion
+벨베스,벨베스,Champion
+벨코즈,벨코즈,Champion
+볼리베어,볼리베어,Champion
+볼베,볼리베어,Champion
+브라움,브라움,Champion
+브라이어,브라이어,Champion
+브라,브라이어,Champion
+브랜드,브랜드,Champion
+블라디미르,블라디미르,Champion
+블라디,블라디미르,Champion
+블리츠크랭크,블리츠크랭크,Champion
+블리츠,블리츠크랭크,Champion
+블츠,블리츠크랭크,Champion
+블크,블리츠크랭크,Champion
+빅토르,빅토르,Champion
+뽀삐,뽀삐,Champion
+사미라,사미라,Champion
+사이온,사이온,Champion
+사일러스,사일러스,Champion
+사일,사일러스,Champion
+샤코,샤코,Champion
+세나,세나,Champion
+세라핀,세라핀,Champion
+라핀,세라핀,Champion
+세주아니,세주아니,Champion
+세주,세주아니,Champion
+세트,세트,Champion
+소나,소나,Champion
+소라카,소라카,Champion
+쉔,쉔,Champion
+쉬바나,쉬바나,Champion
+스웨인,스웨인,Champion
+스카너,스카너,Champion
+스몰더,스몰더,Champion
+몰더,스몰더,Champion
+시비르,시비르,Champion
+신 짜오,신 짜오,Champion
+신짜오,신 짜오,Champion
+짜오,신 짜오,Champion
+신드라,신드라,Champion
+신지드,신지드,Champion
+쓰레쉬,쓰레쉬,Champion
+아리,아리,Champion
+아무무,아무무,Champion
+무무,아무무,Champion
+아우렐리온솔,아우렐리온솔,Champion
+아우렐리온 솔,아우렐리온솔,Champion
+아우솔,아우렐리온솔,Champion
+아우 솔,아우렐리온솔,Champion
+아이번,아이번,Champion
+아지르,아지르,Champion
+아칼리,아칼리,Champion
+아크샨,아크샨,Champion
+아트록스,아트록스,Champion
+아트,아트록스,Champion
+아펠리오스,아펠리오스,Champion
+아펠,아펠리오스,Champion
+알리스타,알리스타,Champion
+알리,알리스타,Champion
+애니,애니,Champion
+애니비아,애니비아,Champion
+애쉬,애쉬,Champion
+야스오,야스오,Champion
+에코,에코,Champion
+엘리스,엘리스,Champion
+오공,오공,Champion
+오른,오른,Champion
+오리아나,오리아나,Champion
+오리,오리아나,Champion
+올라프,올라프,Champion
+요네,요네,Champion
+요릭,요릭,Champion
+우디르,우디르,Champion
+우르곳,우르곳,Champion
+워윅,워윅,Champion
+유미,유미,Champion
+유나라,유나라,Champion
+이렐리아,이렐리아,Champion
+이렐,이렐리아,Champion
+이블린,이블린,Champion
+이즈리얼,이즈리얼,Champion
+이즈,이즈리얼,Champion
+일라오이,일라오이,Champion
+일라,일라오이,Champion
+자야,자야,Champion
+자르반 4세,자르반 4세,Champion
+자르반,자르반 4세,Champion
+자크,자크,Champion
+잔나,잔나,Champion
+잭스,잭스,Champion
+제드,제드,Champion
+제라스,제라스,Champion
+제리,제리,Champion
+제이스,제이스,Champion
+조이,조이,Champion
+직스,직스,Champion
+진,진,Champion
+질리언,질리언,Champion
+징크스,징크스,Champion
+초가스,초가스,Champion
+카르마,카르마,Champion
+카밀,카밀,Champion
+카사딘,카사딘,Champion
+카시오페아,카시오페아,Champion
+카시,카시오페아,Champion
+카이사,카이사,Champion
+카직스,카직스,Champion
+카타리나,카타리나,Champion
+카타,카타리나,Champion
+칼리스타,칼리스타,Champion
+칼리,칼리스타,Champion
+케넨,케넨,Champion
+케이틀린,케이틀린,Champion
+케틀,케이틀린,Champion
+케인,케인,Champion
+케일,케일,Champion
+코그모,코그모,Champion
+코르키,코르키,Champion
+퀸,퀸,Champion
+클레드,클레드,Champion
+키아나,키아나,Champion
+킨드레드,킨드레드,Champion
+킨드,킨드레드,Champion
+타릭,타릭,Champion
+탈론,탈론,Champion
+탈리야,탈리야,Champion
+탐 켄치,탐 켄치,Champion
+탐켄치,탐 켄치,Champion
+트런들,트런들,Champion
+트리스타나,트리스타나,Champion
+트리,트리스타나,Champion
+트타,트리스타나,Champion
+트린다미어,트린다미어,Champion
+트린,트린다미어,Champion
+트위스티드 페이트,트위스티드 페이트,Champion
+트위스티드페이트,트위스티드 페이트,Champion
+트페,트위스티드 페이트,Champion
+트위치,트위치,Champion
+티모,티모,Champion
+파이크,파이크,Champion
+판테온,판테온,Champion
+판테,판테온,Champion
+피들스틱,피들스틱,Champion
+피들,피들스틱,Champion
+피오라,피오라,Champion
+피즈,피즈,Champion
+하이머딩거,하이머딩거,Champion
+하딩,하이머딩거,Champion
+하이머,하이머딩거,Champion
+흐웨이,흐웨이,Champion
+암베사,암베사,Champion
+멜,멜,Champion
+미스 포춘,미스 포춘,Champion
+미스 포츈,미스 포춘,Champion
+미포,미스 포춘,Champion
+크산테,크산테,Champion
+오로라,오로라,Champion
+제드,제드,Champion
+자이라,자이라,Champion
+비에고,비에고,Champion
+---------리젝돼서 추가함 -----------------,,
+디플 기아,디플러스 기아,Team
+디플러스 기아(DK),디플러스 기아,Team
+한화생명e스포츠,한화생명e스포츠,Team
+BNK,BNK 피어엑스,Team
+LCK,2025 LoL 챔피언스 코리아,League
+2025 LCK,2025 LoL 챔피언스 코리아,League
+2025 LoL 챔피언스 코리아,2025 LoL 챔피언스 코리아,League
+2025 LoL 챔피언스 코리아(LCK),2025 LoL 챔피언스 코리아,League
+LCK 챔피언스 코리아,2025 LoL 챔피언스 코리아,League
+LCK 정규 시즌,정규리그,Stage
+LCK 정규리그,정규리그,Stage
+2025 LCK 정규 시즌,정규리그,Stage
+2025 LCK 정규 시즌 1라운드,정규리그,Stage
+정규 시즌 1라운드 경기,정규리그,Stage
+LCK컵,LCK컵,Tournament
+LCK컵 플레이오프,LCK컵 플레이오프,Tournament
+LCK 스프링 시즌 결승 진출전,LCK 스프링 시즌 결승 진출전,Tournament
+플레이오프 결승 진출전,플레이오프 결승 진출전,Stage
+LCK CL,2025 LCK 챌린저스 리그,League
+2025 LCK CL,2025 LCK 챌린저스 리그,League
+2025 LCK 챌린저스 리그,2025 LCK 챌린저스 리그,League
+LCK 챌린저스 리그,2025 LCK 챌린저스 리그,League
+MSI,미드 시즌 인비테이셔널(MSI),Tournament
+미드 시즌 인비테이셔널(MSI),미드 시즌 인비테이셔널(MSI),Tournament
+LoL 월드 챔피언십,LoL 월드 챔피언십,Tournament
+LoL 월드 챔피언십(롤드컵),LoL 월드 챔피언십,Tournament
+LoL 월드챔피언십(롤드컵),LoL 월드 챔피언십,Tournament
+롤드컵,LoL 월드 챔피언십,Tournament
+퍼스트 스탠드 토너먼트,퍼스트 스탠드 토너먼트,Tournament
+구마유시 이민형,구마유시,Player
+'구마유시' 이민형,구마유시,Player
+오너 문현준,오너,Player
+'오너' 문현준,오너,Player
+페이커 이상혁,페이커,Player
+'페이커' 이상혁,페이커,Player
+케리아 류민석,케리아,Player
+'케리아' 류민석,케리아,Player
+도란 최현준,도란,Player
+'도란' 최현준,도란,Player
+스매쉬,신금재,Player
+신금재,신금재,Player
+스매쉬 신금재,신금재,Player
+'스매쉬' 신금재,신금재,Player
+제우스 최우제,제우스,Player
+'제우스' 최우제,제우스,Player
+한왕호,한왕호,Player
+피넛 한왕호,한왕호,Player
+'피넛' 한왕호,한왕호,Player
+제카 김건우,제카,Player
+'제카' 김건우,제카,Player
+바이퍼 박도현,바이퍼,Player
+'바이퍼' 박도현,바이퍼,Player
+딜라이트 유환중,딜라이트,Player
+'딜라이트' 유환중,딜라이트,Player
+비디디 곽보성,'비디디' 곽보성,Player
+'비디디' 곽보성,'비디디' 곽보성,Player
+커즈 문우찬,커즈,Player
+'커즈' 문우찬,커즈,Player
+퍼펙트 이승민,퍼펙트,Player
+'퍼펙트' 이승민,퍼펙트,Player
+덕담 서대길,'덕담' 서대길,Player
+'덕담' 서대길,'덕담' 서대길,Player
+웨이 한길,웨이,Player
+'웨이' 한길,웨이,Player
+피터,정윤수,Player
+정윤수,정윤수,Player
+피터 정윤수,정윤수,Player
+'피터' 정윤수,정윤수,Player
+캐스팅,신민제,Player
+신민제,신민제,Player
+캐스팅 신민제,신민제,Player
+'캐스팅' 신민제,신민제,Player
+파덕,박석현,Player
+박석현,박석현,Player
+파덕 박석현,박석현,Player
+'파덕' 박석현,박석현,Player
+칼릭스,선현빈,Player
+선현빈,선현빈,Player
+칼릭스 선현빈,선현빈,Player
+'칼릭스' 선현빈,선현빈,Player
+풍연,이종혁,Player
+이종혁,이종혁,Player
+풍연 이종혁,이종혁,Player
+'풍연' 이종혁,이종혁,Player
+리치 이재원,리치,Player
+'리치' 이재원,리치,Player
+스펀지 배영준,스펀지,Player
+'스펀지' 배영준,스펀지,Player
+유칼 손우현,유칼,Player
+'유칼' 손우현,유칼,Player
+테디 박진성,테디,Player
+'테디' 박진성,테디,Player
+안딜,안딜,Player
+안딜 문관빈,안딜,Player
+'안딜' 문관빈,안딜,Player
+플레타,손민우,Player
+손민우,손민우,Player
+플레타 손민우,손민우,Player
+'플레타' 손민우,손민우,Player
+킹겐 황성훈,'킹겐' 황성훈,Player
+'킹겐' 황성훈,'킹겐' 황성훈,Player
+기드온 김민성,기드온,Player
+'기드온' 김민성,기드온,Player
+리헨즈 손시우,리헨즈,Player
+'리헨즈' 손시우,리헨즈,Player
+지우 정지우,지우,Player
+클로저 이주현,클로저,Player
+'클로저' 이주현,클로저,Player
+모건 박루한,모건,Player
+모건 박루한,모건,Player
+두두 이동주,두두,Player
+표식 홍창현,표식,Player
+불독 이태영,불독 이태영,Player
+클리어 송현민,클리어,Player
+'클리어' 송현민,클리어,Player
+랩터 전어진,'랩터' 전어진,Player
+'랩터' 전어진,'랩터' 전어진,Player
+빅라 이대광,빅라,Player
+'빅라' 이대광,빅라,Player
+디아블 남대근,디아블,Player
+'디아블' 남대근,디아블,Player
+켈린 김형규,켈린,Player
+'켈린' 김형규,켈린,Player
+캐니언 김건부,캐니언,Player
+'캐니언' 김건부,캐니언,Player
+쵸비 정지훈,'쵸비' 정지훈,Player
+'쵸비' 정지훈,'쵸비' 정지훈,Player
+기인 김기인,기인,Player
+룰러 박재혁,룰러,Player
+루시드 최용혁,루시드,Player
+에이밍 김하람,에이밍,Player
+쇼메이커 허수,쇼메이커,Player
+데프트,김혁규,Player
+김혁규,김혁규,Player
+유상욱,유상욱,HeadCoach
+김상수 감독,김상수 감독,HeadCoach
+'댄디' 최인규,'댄디' 최인규,HeadCoach
+내셔 남작 버프,바론,Objective
+드래곤 영혼,드래곤 영혼,Objective
+드래곤의 영혼,드래곤 영혼,Objective
+대지 드래곤 영혼,대지 드래곤 영혼,Objective
+대지 드래곤의 영혼,대지 드래곤 영혼,Objective
+바다 드래곤 영혼,바다 드래곤 영혼,Objective
+바다 드래곤의 영혼,바다 드래곤 영혼,Objective
+드래곤 스택,드래곤 스택,Objective
+드래곤 3스택,드래곤 스택,Objective
+드래곤 버프,드래곤 스택,Objective
+아타칸 버프,아타칸 버프,Objective
+오브젝트 교전,오브젝트 교전,Event
+유충 전투,유충 전투,Event
+미드 2차 포탑,2차 포탑,Structure
+바텀 2차 포탑,2차 포탑,Structure
+바텀 포탑,포탑,Structure
+내셔 남작 둥지 전투,내셔 남작 둥지 전투,Event
+LCK 아레나,LCK 아레나,Venue
+바텀 듀오,바텀 듀오,Role
+착취의 손아귀,착취의 손아귀,Rune
+정복자,정복자,Rune
+소환사 주문,소환사 주문,Spell
+헤르메스의 발걸음,헤르메스의 발걸음,Item
+영겁의 지팡이,영겁의 지팡이,Item
+리안드리의 고통,리안드리의 고통,Item
+손승익,손승익,Coach
+애니원스 레전드(AL),애니원스 레전드,Team
+애니원스 레전드,애니원스 레전드,Team
+AL,애니원스 레전드,Team
+월드 엘리트(WE),월드 엘리트,Team
+월드 엘리트,월드 엘리트,Team
+WE,월드 엘리트,Team
+플랑드레,플랑드레,Player
+'불' 송선규,불,Player
+불 송선규,불,Player
+송선규,불,Player
+불,불,Player
+'함유진',함박,Player
+함박 함유진,함박,Player
+'더샤이' 강승록,강승록,Player
+더샤이 강승록,강승록,Player
+더샤이,강승록,Player
+강승록,강승록,Player
+엘림 최엘림,최엘림,Player
+'엘림' 최엘림,최엘림,Player
+엘림,최엘림,Player
+최엘림,최엘림,Player
+크로코 김동범,김동범,Player
+'크로코' 김동범,김동범,Player
+크로코,김동범,Player
+김동범,김동범,Player
+KT 고동빈,스코어,HeadCoach
+김성수,김성수,Coach
+조 마시,조 마시,Coach
+김다빈,김다빈,Coach
+'가든' 설정원,설정원,Player
+가든 설정원,설정원,Player
+가든,설정원,Player
+설정원,설정원,Player
+웨인 황서현,황서현,Player
+웨인,황서현,Player
+황서현,황서현,Player
+한별 강한별,강한별,Player
+한별,강한별,Player
+강한별,강한별,Player
+소보로 임성민,임성민,Player
+소보로,임성민,Player
+임성민,임성민,Player
+위너 우주성,우주성,Player
+위너,우주성,Player
+우주성,우주성,Player
+윌러 김정현,김정현,Player
+윌러,김정현,Player
+김정현,김정현,Player
+2025 LoL 챔피언스 코리아(LCK) 정규 시즌 1라운드 경기,정규리그,Stage
+2025 LoL 챔피언스 코리아(LCK) 정규 시즌,정규리그,Stage
