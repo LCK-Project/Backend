@@ -212,63 +212,68 @@ LIMIT $limit
 # 결과 변환
 # =========================
 
-def _add_node(nodes, node):
+def _add_node(nodes, node, seed_ids):
     node_id = str(node.element_id)
 
     if node_id not in nodes:
-        nodes[node_id] = {
-            "id": node_id,
-            "name": _node_name(node),
-            "label": _node_label(node),
-        }
+        nodes[node_id] = node_to_dict(node, node_id in seed_ids)
 
     return node_id
 
 
-def _add_link(links, seen_links, source_id, target_id, relation_name):
-    link_key = (source_id, target_id, relation_name)
-
-    if link_key in seen_links:
-        return
-
-    seen_links.add(link_key)
-
-    links.append({
-        "source": source_id,
-        "target": target_id,
-        "type": relation_name,
-    })
+def _claim_evidence(record):
+    return {
+        "article_key": record["article_key"],
+        "text": record["evidence_text"],
+        "confidence": record["confidence"],
+    }
 
 
-def _record_relation_nodes(record):
-    source = record.get("source")
-    target = record.get("target")
+def _iter_edges(structure_records, claim_records):
+    """구조 레코드 먼저, 클레임 레코드 다음 순서로 (source, target, type, evidence) 를 낸다.
 
-    if source is None or target is None:
-        return record["n"], record["m"]
+    같은 (source, target, type) 은 먼저 나온 것만 남으므로 구조 간선이 클레임 간선보다 우선한다.
+    """
+    seen = set()
 
-    return source, target
+    for record in structure_records:
+        source, target = record["source"], record["target"]
+        edge = (source, target, _relation_name(record["r"]), None)
+        key = (str(source.element_id), str(target.element_id), edge[2])
+
+        if key not in seen:
+            seen.add(key)
+            yield edge
+
+    for record in claim_records:
+        source, target = record["s"], record["t"]
+        edge = (source, target, record["relation_type"], _claim_evidence(record))
+        key = (str(source.element_id), str(target.element_id), edge[2])
+
+        if key not in seen:
+            seen.add(key)
+            yield edge
 
 
-def _records_to_graph(records):
+def records_to_graph(structure_records: list, claim_records: list, seed_ids: set[str]) -> dict:
     nodes = {}
     links = []
-    seen_links = set()
 
-    for record in records:
-        r = record["r"]
-        source, target = _record_relation_nodes(record)
+    for source, target, relation, evidence in _iter_edges(structure_records, claim_records):
+        source_id = _add_node(nodes, source, seed_ids)
+        target_id = _add_node(nodes, target, seed_ids)
 
-        source_id = _add_node(nodes, source)
-        target_id = _add_node(nodes, target)
+        links.append({
+            "source": source_id,
+            "target": target_id,
+            "type": relation,
+            "evidence": evidence,
+        })
 
-        _add_link(
-            links=links,
-            seen_links=seen_links,
-            source_id=source_id,
-            target_id=target_id,
-            relation_name=_relation_name(r),
-        )
+    # degree 는 응답에 담긴 간선 기준으로 양끝 등장 횟수를 센다.
+    for link in links:
+        nodes[link["source"]]["degree"] += 1
+        nodes[link["target"]]["degree"] += 1
 
     return {
         "nodes": list(nodes.values()),
@@ -276,20 +281,21 @@ def _records_to_graph(records):
     }
 
 
-def _records_to_facts(records):
+def records_to_facts(structure_records: list, claim_records: list) -> list[dict]:
     facts = []
     seen_facts = set()
 
-    for record in records:
-        r = record["r"]
-        source, target = _record_relation_nodes(record)
+    for source, target, relation, evidence in _iter_edges(structure_records, claim_records):
+        source_node = node_to_dict(source, False)
+        target_node = node_to_dict(target, False)
 
         fact = {
-            "source": _node_name(source),
-            "source_label": _node_label(source),
-            "relation": _relation_name(r),
-            "target": _node_name(target),
-            "target_label": _node_label(target),
+            "source": source_node["name"],
+            "source_label": source_node["label"],
+            "relation": relation,
+            "target": target_node["name"],
+            "target_label": target_node["label"],
+            "evidence": evidence,
         }
 
         fact_key = (
@@ -364,8 +370,9 @@ def search_graph_knowledge(keywords, limit=100):
         print(f"DEBUG no graph match for keywords {keywords}")
         return _empty_graph_result(keywords)
 
-    graph = _records_to_graph(records)
-    facts = _records_to_facts(records)
+    seed_ids = {str(record["n"].element_id) for record in records}
+    graph = records_to_graph(records, [], seed_ids)
+    facts = records_to_facts(records, [])
     context = format_graph_facts(facts)
 
     print("DEBUG graph nodes:", len(graph["nodes"]))
