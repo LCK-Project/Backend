@@ -1,0 +1,13 @@
+.venv
+chroma_db
+__pycache__
+*.pyc
+.env
+*.sql
+kmib_lck_yunminsop.json
+vector_data.json
+lck_kg.db
+.claude
+.git
+docs
+tests

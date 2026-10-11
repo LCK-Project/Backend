@@ -12,10 +12,10 @@
 
 from clova_extract import (
     analyze_question_intent,
-    call_hyperclova_summary,
     call_hyperclova_kg_answer,
-    call_hyperclova_rdb_answer,
     call_hyperclova_merge,
+    call_hyperclova_rdb_answer,
+    call_hyperclova_summary,
 )
 from neo4j_query import search_graph_knowledge
 
@@ -28,7 +28,7 @@ def _search_rdb_safe(question, keywords, graph_limit=40):
     try:
         from rdb_query import search_rdb_knowledge
         return search_rdb_knowledge(question, keywords, max_facts=graph_limit)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print("DEBUG RDB search failed:", e)
         return {
             "keywords": [], "entities": {"players": [], "teams": []},
@@ -39,12 +39,12 @@ def _search_rdb_safe(question, keywords, graph_limit=40):
 def _search_articles_safe(question, top_k=3):
     """
     ChromaDB 기사 검색. import/조회 실패가 전체 답변을 죽이지 않도록 감싼다.
-    (rag_answer는 import 시 임베딩 모델을 로드하므로 지연 import)
+    (rag_answer는 clova_extract·chroma_client 를 끌어오므로 지연 import)
     """
     try:
         from rag_answer import search_articles
         return search_articles(question, top_k=top_k)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print("DEBUG article search failed:", e)
         return []
 
@@ -60,7 +60,8 @@ def run_pipeline(question, top_k=3, graph_limit=100):
     docs = _search_articles_safe(question, top_k=top_k)
     if docs:
         article_context = "\n\n".join(
-            f"[참고자료 {i + 1}]\n{doc}" for i, doc in enumerate(docs)
+            f"[참고자료 {i + 1}] {doc['title']} ({doc['published_at'][:10]})\n{doc['text']}"
+            for i, doc in enumerate(docs)
         )
         article_answer = call_hyperclova_summary(question, article_context)
     else:

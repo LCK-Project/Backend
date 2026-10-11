@@ -1,0 +1,7 @@
+# 통합 대장
+# 태스크	SHA	검증
+T1 그래프 패널 백엔드(Task 2~6 + LIMIT 보강)	34aae8128ec6f99c9ddfb90fa2fe9449dfb10a2a	pytest 25 passed(main), Aura 확인 Match 40·MEMBER_OF/WON_MATCH 공존, /node 404 변형 id 4종, Opus 리뷰 Critical/Important 0
+T1 후속: /node 이웃 중복 제거(통합 검증 관찰 2)	d23ea40ab49a03117d8b1f27411c2922e29160be	pytest 26 passed(main), Aura 그룹별 neighbors 수 = id 집합 크기, degree 368 유지
+DOCKER(Task 2~5 + entrypoint 인자 전달 + README 제목 정리)	77efb8e	pytest 37 passed(main), 깨끗한 main에서 compose up --build(API_HOST_PORT=8002): ChromaDB 빌드 완료 1242 청크/634 기사, GET / 200, /ask article_chunks 3·article_answer 채워짐·그래프 98노드(Game·ArticleClaim 0, unknown 0), Frontend compose(5501) config.js 주입 200. Opus 리뷰 I-1 수정, I-2 보류 결정
+후속: 의도 분석 캐시(스펙 완료 조건 5) + 테스트 중복 import 정리	a40f3e5	pytest 40 passed, ruff --select F,E9 All checks passed, compileall ok, uvicorn 8003에서 /ask 2회 → kg_keywords·노드 98·간선 140 순서까지 동일
+후속: 린트·타입체크 녹색화(pyproject.toml, ruff·mypy 핀)	2bc7a16	pytest 40 passed, ruff check . All checks passed(전역 설정 기준 38건→0), mypy . Success(10건→0), uvicorn 8003 smoke /ask 200·그래프 98노드, /node?id=abc 404

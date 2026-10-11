@@ -1,9 +1,10 @@
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from neo4j_query import get_node_detail
 from pipeline import run_pipeline
 
 app = FastAPI(title="LCK Knowledge Graph API")
@@ -51,3 +52,13 @@ def ask(req: QuestionRequest):
         "rdb_facts": result["rdb_facts"],
         "rdb_sql": result["rdb_sql"],
     }
+
+
+@app.get("/node")
+def node(id: str):
+    detail = get_node_detail(id)
+
+    if detail is None:
+        raise HTTPException(status_code=404, detail="node not found")
+
+    return detail

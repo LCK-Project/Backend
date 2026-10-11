@@ -1,6 +1,9 @@
-import os
+import contextlib
+import copy
 import json
+import os
 import uuid
+
 import requests
 from dotenv import load_dotenv
 
@@ -65,8 +68,9 @@ def extract_content_from_clova_response(response_text):
     최종 content만 안정적으로 추출하는 함수
     """
 
-    # 1) 혹시 일반 JSON 응답이면 먼저 처리
-    try:
+    # 1) 혹시 일반 JSON 응답이면 먼저 처리.
+    # 스트리밍 응답이면 여기서 항상 실패하는 것이 정상 경로라 로그 없이 2) 로 넘긴다.
+    with contextlib.suppress(Exception):
         data = json.loads(response_text)
 
         if "result" in data:
@@ -82,9 +86,6 @@ def extract_content_from_clova_response(response_text):
 
         if "choices" in data:
             return data["choices"][0]["message"]["content"]
-
-    except:
-        pass
 
     # 2) text/event-stream 응답 처리
     contents = []
@@ -108,7 +109,7 @@ def extract_content_from_clova_response(response_text):
                 msg = obj["message"]
 
                 # content가 있으면 우선 사용
-                if "content" in msg and msg["content"]:
+                if msg.get("content"):
                     contents.append(msg["content"])
 
                 # thinkingContent는 최종 답변이 아니라 중간 추론일 수 있으므로 제외
@@ -125,10 +126,11 @@ def extract_content_from_clova_response(response_text):
 
             elif "choices" in obj:
                 delta = obj["choices"][0].get("delta", {})
-                if "content" in delta and delta["content"]:
+                if delta.get("content"):
                     contents.append(delta["content"])
 
-        except:
+        except Exception as e:  # noqa: BLE001
+            print(f"CLOVA 스트리밍 줄 파싱 실패, 건너뜀: {e}")
             continue
 
     final_text = "".join(contents).strip()
@@ -155,7 +157,7 @@ def parse_json_only(text):
     text = text[start:]
 
     decoder = json.JSONDecoder()
-    obj, end = decoder.raw_decode(text)
+    obj, _ = decoder.raw_decode(text)
 
     return obj
 
@@ -221,7 +223,7 @@ def extract_entities_with_clova(chunk):
     try:
         result = parse_json_only(content)
         return result
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print("JSON 파싱 실패:", e)
         return {
             "players": [],
@@ -318,7 +320,7 @@ def _call_clova_chat(system_prompt, user_prompt, *, temperature=0.2, max_tokens=
     return extract_content_from_clova_response(response.text), None
 
 
-def analyze_question_intent(question):
+def _analyze_question_intent_uncached(question):
     """
     질문 의도 분석(파이프라인 1단계).
     HyperCLOVA로 의도 문장과 검색 키워드 목록을 추출한다.
@@ -340,7 +342,7 @@ def analyze_question_intent(question):
 {question}
 """
 
-    content, error = _call_clova_chat(system, user, temperature=0.1, max_tokens=512)
+    content, error = _call_clova_chat(system, user, temperature=0.0, max_tokens=512)
 
     if error or not content:
         return {"intent": "", "keywords": [], "error": error}
@@ -351,9 +353,41 @@ def analyze_question_intent(question):
             result["keywords"] = []
         result.setdefault("intent", "")
         return result
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print("의도 분석 JSON 파싱 실패:", e)
         return {"intent": "", "keywords": [], "error": str(e), "raw_content": content}
+
+
+# 의도 분석 결과 캐시. LLM 키워드 추출이 호출마다 달라지면 같은 질문에도 그래프가 바뀌어
+# 그래프 좌표가 흔들린다(완료 조건 5). 같은 질문에는 같은 키워드·그래프를 돌려주도록 프로세스 안에서 고정한다.
+# functools.lru_cache 는 오류 결과까지 캐시하므로 쓰지 않고, 오류가 없는 결과만 넣는다.
+_INTENT_CACHE_MAX = 256
+_intent_cache: dict[str, dict] = {}
+
+
+def analyze_question_intent(question):
+    """
+    질문 의도 분석의 캐시 래퍼. 앞뒤 공백을 지운 질문을 키로 쓰고,
+    호출자가 캐시를 바꾸지 못하도록 사본을 돌려준다.
+    반환: {"intent": str, "keywords": list[str]}
+    """
+    key = question.strip()
+
+    if key in _intent_cache:
+        return copy.deepcopy(_intent_cache[key])
+
+    result = _analyze_question_intent_uncached(key)
+
+    if "error" not in result:
+        # dict 는 삽입 순서를 지키므로 첫 키가 가장 오래된 항목이다.
+        if len(_intent_cache) >= _INTENT_CACHE_MAX:
+            del _intent_cache[next(iter(_intent_cache))]
+        _intent_cache[key] = copy.deepcopy(result)
+
+    return result
+
+
+setattr(analyze_question_intent, "cache_clear", _intent_cache.clear)  # noqa: B010
 
 
 def call_hyperclova_merge(question, article_answer, graph_answer, rdb_answer=""):
