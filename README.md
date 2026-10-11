@@ -127,10 +127,30 @@ curl -X POST http://localhost:8000/ask \
 |------|------|
 | `answer` | 최종 통합 답변 |
 | `article_answer`, `graph_answer`, `rdb_answer` | 경로별 개별 답변 |
-| `graph` | 프론트엔드 시각화용 그래프(`nodes`, `edges`) |
-| `related_chunks`, `graph_facts` | 그래프에서 찾은 관계 근거 |
+| `graph` | 프론트엔드 시각화용 그래프. `nodes`(id, name, label, degree, is_seed, match_date, props) / `links`(source, target, type, evidence) |
+| `related_chunks`, `graph_facts` | 그래프에서 찾은 관계 근거. `graph_facts` 각 항목은 source, source_label, relation, target, target_label, evidence |
 | `article_chunks` | 검색된 기사 청크 |
 | `rdb_facts`, `rdb_entities`, `rdb_sql` | 통계 근거와 실행된 SQL |
+
+### 노드 상세 조회
+
+그래프에서 노드를 고르면 그 노드의 1홉 관계를 묶어서 돌려줍니다. `id` 에는 `/ask` 응답의 `graph.nodes[].id` 를 넣습니다.
+
+```bash
+curl "localhost:8000/node?id=<graph.nodes[].id>"
+```
+
+응답 키:
+
+| 키 | 내용 |
+|------|------|
+| `id`, `name`, `label` | 선택한 노드 |
+| `degree` | 시각화 제외 라벨·관계를 뺀 DB 기준 1홉 차수 |
+| `record` | Team·Player 이면 `{wins, losses}`(WON_MATCH·LOST_MATCH 수), 그 외 `null` |
+| `match` | Match 이면 `match_stage, score_a, score_b, best_of, team_a_key, team_b_key, winner_key`, 그 외 `null` |
+| `groups` | `(relation, direction)` 별 이웃 묶음. 이웃 수가 많은 순, 각 묶음 `neighbors`(id, name, label, role)는 이름순 최대 20개 |
+
+노드가 없으면 `404 {"detail": "node not found"}` 를 돌려줍니다.
 
 ## 프론트엔드 연동
 
