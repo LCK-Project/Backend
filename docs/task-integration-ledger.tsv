@@ -1,3 +1,4 @@
 # 통합 대장
 # 태스크	SHA	검증
 T1 그래프 패널 백엔드(Task 2~6 + LIMIT 보강)	34aae8128ec6f99c9ddfb90fa2fe9449dfb10a2a	pytest 25 passed(main), Aura 확인 Match 40·MEMBER_OF/WON_MATCH 공존, /node 404 변형 id 4종, Opus 리뷰 Critical/Important 0
+T1 후속: /node 이웃 중복 제거(통합 검증 관찰 2)	d23ea40ab49a03117d8b1f27411c2922e29160be	pytest 26 passed(main), Aura 그룹별 neighbors 수 = id 집합 크기, degree 368 유지
