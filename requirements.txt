@@ -1,11 +1,13 @@
-fastapi
-uvicorn[standard]
-pydantic
-python-dotenv
-requests
-neo4j
-pymysql
-chromadb
-sentence-transformers
-pandas
-pytest
+--extra-index-url https://download.pytorch.org/whl/cpu
+fastapi==0.143.0
+uvicorn[standard]==0.54.0
+pydantic==2.14.0
+python-dotenv==1.2.4
+requests==2.34.2
+neo4j==6.4.0
+pymysql==1.2.3
+chromadb==1.5.9
+sentence-transformers==6.1.0
+pandas==3.0.6
+pytest==9.1.1
+torch==2.14.1
