@@ -285,7 +285,7 @@ def _iter_edges(structure_records, claim_records):
 
 
 def records_to_graph(structure_records: list, claim_records: list, seed_ids: set[str]) -> dict:
-    nodes = {}
+    nodes: dict[str, dict] = {}
     links = []
 
     for source, target, relation, evidence in _iter_edges(structure_records, claim_records):
@@ -458,7 +458,7 @@ def get_node_detail(node_id: str) -> dict | None:
 
     # (relation, direction) 별로 이웃 id 를 키로 모은다. 기간별 MEMBER_OF 처럼 같은 이웃과의
     # 간선이 여럿이면 하나로 합친다. degree 는 합치기 전 간선 수(DB 1홉 차수)로 센다.
-    groups = {}
+    groups: dict[tuple[str, str], dict[str, dict]] = {}
     degree = 0
     wins = 0
     losses = 0

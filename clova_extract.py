@@ -362,7 +362,7 @@ def _analyze_question_intent_uncached(question):
 # 그래프 좌표가 흔들린다(완료 조건 5). 같은 질문에는 같은 키워드·그래프를 돌려주도록 프로세스 안에서 고정한다.
 # functools.lru_cache 는 오류 결과까지 캐시하므로 쓰지 않고, 오류가 없는 결과만 넣는다.
 _INTENT_CACHE_MAX = 256
-_intent_cache = {}
+_intent_cache: dict[str, dict] = {}
 
 
 def analyze_question_intent(question):
@@ -387,7 +387,7 @@ def analyze_question_intent(question):
     return result
 
 
-analyze_question_intent.cache_clear = _intent_cache.clear
+setattr(analyze_question_intent, "cache_clear", _intent_cache.clear)  # noqa: B010
 
 
 def call_hyperclova_merge(question, article_answer, graph_answer, rdb_answer=""):

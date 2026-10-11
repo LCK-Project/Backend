@@ -1,12 +1,13 @@
 import json
 import os
+from typing import Any
 
 import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
-params = {
+params: dict[str, Any] = {
   "argument": {
     "query": "LCK",
     "published_at": {

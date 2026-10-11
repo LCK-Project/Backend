@@ -3,7 +3,7 @@ import sys
 # Windows 콘솔(cp949)에서 이모지 등 유니코드 출력 시 UnicodeEncodeError 방지
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
-    sys.stderr.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
 
 print("🚨 지금 실행되는 main.py 맞음")
 import json
