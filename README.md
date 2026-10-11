@@ -166,7 +166,7 @@ curl -X POST http://localhost:8000/ask \
 | `article_chunks` | 검색된 기사 청크 |
 | `rdb_facts`, `rdb_entities`, `rdb_sql` | 통계 근거와 실행된 SQL |
 
-### 노드 상세 조회
+#### 노드 상세 조회
 
 그래프에서 노드를 고르면 그 노드의 1홉 관계를 묶어서 돌려줍니다. `id` 에는 `/ask` 응답의 `graph.nodes[].id` 를 넣습니다.
 
