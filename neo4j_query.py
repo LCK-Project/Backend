@@ -202,14 +202,22 @@ AND any(kw IN $keywords WHERE
 """
 
 
+# 시드 하나의 구조 간선을 관계 타입별로 이만큼만 가져와 LIMIT 안에서 매치·소속·코치 관계가 고루 들어가게 한다.
+STRUCTURE_PER_TYPE_LIMIT = 20
+
+
 # 1) 구조 간선. Game·ArticleClaim 은 제외 라벨로, 클레임 연결 관계는 제외 관계로 빠진다.
+# 같은 (n, 타입, m) 의 중복 관계는 하나로 접고, 타입별 상한을 건 뒤 전체 LIMIT 를 건다.
 KEYWORD_CYPHER = f"""
 MATCH (n)
 {SEED_WHERE}
 MATCH (n)-[r]-(m)
 WHERE NOT type(r) IN $excluded_relations
 AND none(label IN labels(m) WHERE label IN $excluded_labels)
-RETURN n, r, m, startNode(r) AS source, endNode(r) AS target
+WITH n, type(r) AS rel_type, m, head(collect(r)) AS r
+WITH n, rel_type, collect({{r: r, m: m}})[0..$per_type] AS items
+UNWIND items AS item
+RETURN n, item.r AS r, item.m AS m, startNode(item.r) AS source, endNode(item.r) AS target
 LIMIT $limit
 """
 
@@ -381,6 +389,7 @@ def search_graph_knowledge(keywords, limit=100):
         "excluded_relations": EXCLUDED_RELATIONS,
         "excluded_labels": EXCLUDED_LABELS,
         "limit": limit,
+        "per_type": STRUCTURE_PER_TYPE_LIMIT,
     }
 
     with driver.session() as session:
