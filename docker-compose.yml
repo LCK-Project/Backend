@@ -1,0 +1,29 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD를 .env에 채워야 합니다}
+      MYSQL_DATABASE: espo
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./Dump_Espo.sql:/docker-entrypoint-initdb.d/01-espo.sql:ro
+    ports: ["${MYSQL_HOST_PORT:-3307}:3306"]
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -uroot -p$$MYSQL_ROOT_PASSWORD -N -e 'SELECT COUNT(*) FROM espo.article' | grep -qv '^0$$'"]
+      interval: 5s
+      retries: 60
+  api:
+    build: .
+    env_file: .env
+    environment:
+      MYSQL_HOST: mysql          # .env의 127.0.0.1을 덮어쓴다
+      MYSQL_PORT: "3306"
+      CHROMA_PATH: /data/chroma_db
+      HF_HOME: /data/hf_cache
+    volumes:
+      - chroma-data:/data/chroma_db
+      - hf-cache:/data/hf_cache
+    ports: ["${API_HOST_PORT:-8000}:8000"]
+    depends_on: { mysql: { condition: service_healthy } }
+volumes: { mysql-data: {}, chroma-data: {}, hf-cache: {} }

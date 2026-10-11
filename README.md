@@ -5,6 +5,33 @@ LCK(리그 오브 레전드 챔피언스 코리아) 뉴스 기사를 기반으�
 HyperCLOVA X 로 최종 답변을 생성하고, FastAPI 로 제공합니다.
 프론트엔드는 [LCK-Project/Frontend](https://github.com/LCK-Project/Frontend) 레포에 있습니다.
 
+## 빠른 시작(Docker)
+
+Docker Desktop(또는 Docker Engine + Compose)만 있으면 API 서버와 MySQL 이 함께 뜹니다.
+
+```bash
+git clone https://github.com/LCK-Project/Backend.git
+cd Backend
+cp .env.example .env
+```
+
+`.env` 에서 아래 값을 채웁니다. MySQL 계정은 root 고정이며 `MYSQL_PASSWORD` 가 비어 있으면 compose 가 바로 멈춥니다.
+
+- Neo4j: `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`, `NEO4J_DATABASE`
+- HyperCLOVA X: `CLOVA_API_KEY`, `CLOVA_APP_TYPE`, `CLOVA_MODEL`
+- MySQL: `MYSQL_PASSWORD` (컨테이너의 root 비밀번호가 됩니다)
+
+```bash
+docker compose up --build
+```
+
+첫 기동은 MySQL 덤프 복원, 임베딩 모델 다운로드, 기사 임베딩 때문에 5~10분 걸리고 그동안 8000 포트는 닫혀 있습니다.
+벡터 DB 와 모델 캐시는 볼륨에 남으므로 다음 기동부터는 바로 뜹니다. 확인은 `curl localhost:8000/` 입니다.
+
+- 포트 바꾸기: `.env` 에 `MYSQL_HOST_PORT`(기본 3307), `API_HOST_PORT`(기본 8000)
+- 벡터 DB 재빌드: `docker compose stop api && docker compose run --rm api python build_vector_db.py --rebuild && docker compose start api` (api 가 떠 있는 동안 같은 볼륨에 쓰면 ChromaDB 가 두 프로세스에서 열리므로 먼저 멈춘다)
+- 전부 초기화: `docker compose down -v` (MySQL·벡터 DB·모델 캐시 볼륨 삭제)
+
 ## 답변 흐름
 
 ```text
@@ -45,20 +72,6 @@ HyperCLOVA X 로 최종 답변을 생성하고, FastAPI 로 제공합니다.
 - NAVER HyperCLOVA X API 키
 - (선택) 빅카인즈 뉴스 API 키. 기사 수집을 새로 할 때만 필요합니다.
 
-## 설치
-
-```bash
-git clone https://github.com/LCK-Project/Backend.git
-cd Backend
-
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-`sentence-transformers` 설치 시 PyTorch 가 함께 받아지므로 시간이 걸릴 수 있습니다.
-임베딩 모델 `jhgan/ko-sroberta-multitask` 는 최초 실행 시 자동으로 다운로드됩니다.
-
 ## 환경변수
 
 `.env.example` 을 복사해 `.env` 를 만들고 값을 채웁니다.
@@ -75,11 +88,29 @@ cp .env.example .env
 | `NEWS_API_ACCESS_KEY` | 빅카인즈 API 키 (기사 수집 시에만) |
 | `CORS_ORIGINS` | 허용할 프론트엔드 origin. 쉼표로 여러 개 지정, 기본값 `*` |
 
-## 데이터 준비
+## Docker 없이 실행
+
+호스트의 Python 가상환경에서 직접 실행할 때의 절차입니다. 위 "사전 준비"와 "환경변수"를 먼저 마칩니다.
+
+### 설치
+
+```bash
+git clone https://github.com/LCK-Project/Backend.git
+cd Backend
+
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+`sentence-transformers` 설치 시 PyTorch 가 함께 받아지므로 시간이 걸릴 수 있습니다.
+임베딩 모델 `jhgan/ko-sroberta-multitask` 는 최초 실행 시 자동으로 다운로드됩니다.
+
+### 데이터 준비
 
 처음 한 번만 수행합니다. 이미 구축된 DB 가 있으면 건너뜁니다.
 
-### 1. MySQL 통계 DB 복원
+#### 1. MySQL 통계 DB 복원
 
 ```bash
 mysql -u root -p -e "CREATE DATABASE espo CHARACTER SET utf8mb4;"
@@ -87,15 +118,18 @@ mysql -u root -p espo < Dump_Espo.sql
 python mysql_connect.py        # 연결 확인
 ```
 
-### 2. 벡터 DB(ChromaDB) 구축
+#### 2. 벡터 DB(ChromaDB) 구축
+
+MySQL `article` 테이블의 기사를 읽어 만들므로 1번이 먼저 끝나 있어야 합니다.
 
 ```bash
-python make_vector_data.py     # 기사 → vector_data.json (이미 포함되어 있으면 생략 가능)
-python build_vector_db.py      # vector_data.json → ./chroma_db
-python test_vector_search.py   # 검색 확인
+python build_vector_db.py --rebuild   # MySQL article → ./chroma_db (CHROMA_PATH 로 경로 변경)
+python test_vector_search.py          # 검색 확인
 ```
 
-### 3. 지식그래프(Neo4j) 구축
+`--if-missing` 을 주면 완료 마커(`chroma_db/.complete`)의 기사 건수가 현재와 같을 때 건너뜁니다.
+
+#### 3. 지식그래프(Neo4j) 구축
 
 기사를 청킹하고 HyperCLOVA 로 엔티티·관계를 추출해 Neo4j 에 적재합니다. LLM 호출이 많아 시간이 오래 걸립니다.
 
@@ -104,7 +138,7 @@ python main.py
 python test_neo4j_query.py     # 조회 확인
 ```
 
-## 서버 실행
+### 서버 실행
 
 ```bash
 uvicorn api_server:app --host 0.0.0.0 --port 8000 --reload
@@ -113,7 +147,7 @@ uvicorn api_server:app --host 0.0.0.0 --port 8000 --reload
 - 상태 확인: `GET http://localhost:8000/`
 - API 문서: `http://localhost:8000/docs`
 
-### 질의 예시
+#### 질의 예시
 
 ```bash
 curl -X POST http://localhost:8000/ask \
@@ -132,7 +166,7 @@ curl -X POST http://localhost:8000/ask \
 | `article_chunks` | 검색된 기사 청크 |
 | `rdb_facts`, `rdb_entities`, `rdb_sql` | 통계 근거와 실행된 SQL |
 
-### 노드 상세 조회
+#### 노드 상세 조회
 
 그래프에서 노드를 고르면 그 노드의 1홉 관계를 묶어서 돌려줍니다. `id` 에는 `/ask` 응답의 `graph.nodes[].id` 를 넣습니다.
 
