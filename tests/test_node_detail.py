@@ -36,3 +36,9 @@ def test_match_node_returns_match_props_and_null_record(monkeypatch):
 def test_neighbors_capped_at_twenty(monkeypatch):
     patch(monkeypatch, [rec(HLE, StubRel("MEMBER_OF", P(100 + i, f"선수{i:02d}"), HLE), P(100 + i, f"선수{i:02d}")) for i in range(25)])
     d = q.get_node_detail("4:x:1"); assert len(d["groups"][0]["neighbors"]) == 20 and d["degree"] == 25
+def test_duplicate_neighbor_collapsed_within_group(monkeypatch):
+    zeka = P(3, "제카")
+    patch(monkeypatch, [rec(HLE, StubRel("MEMBER_OF", zeka, HLE, {"role": "MID"}), zeka), rec(HLE, StubRel("MEMBER_OF", zeka, HLE, {"role": "MID"}), zeka), rec(HLE, StubRel("MEMBER_OF", P(4, "바이퍼"), HLE), P(4, "바이퍼"))])
+    d = q.get_node_detail("4:x:1")
+    assert [n["name"] for n in d["groups"][0]["neighbors"]] == ["바이퍼", "제카"]
+    assert d["groups"][0]["neighbors"][1]["role"] == "MID" and d["degree"] == 3

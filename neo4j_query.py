@@ -455,7 +455,10 @@ def get_node_detail(node_id: str) -> dict | None:
     node = node_to_dict(records[0]["n"], False)
     selected_id = node["id"]
 
+    # (relation, direction) 별로 이웃 id 를 키로 모은다. 기간별 MEMBER_OF 처럼 같은 이웃과의
+    # 간선이 여럿이면 하나로 합친다. degree 는 합치기 전 간선 수(DB 1홉 차수)로 센다.
     groups = {}
+    degree = 0
     wins = 0
     losses = 0
 
@@ -468,34 +471,42 @@ def get_node_detail(node_id: str) -> dict | None:
         relation = _relation_name(r)
         direction = "out" if str(record["source"].element_id) == selected_id else "in"
         neighbor = node_to_dict(record["m"], False)
+        role = r.get("role") if relation == "MEMBER_OF" else None
+        degree += 1
 
-        groups.setdefault((relation, direction), []).append({
-            "id": neighbor["id"],
-            "name": neighbor["name"],
-            "label": neighbor["label"],
-            "role": r.get("role") if relation == "MEMBER_OF" else None,
-        })
+        neighbors = groups.setdefault((relation, direction), {})
+        existing = neighbors.get(neighbor["id"])
+
+        if existing is None:
+            neighbors[neighbor["id"]] = {
+                "id": neighbor["id"],
+                "name": neighbor["name"],
+                "label": neighbor["label"],
+                "role": role,
+            }
+        elif existing["role"] is None:
+            existing["role"] = role
 
         if relation == "WON_MATCH":
             wins += 1
         elif relation == "LOST_MATCH":
             losses += 1
 
-    # 이웃 수 내림차순, 같으면 관계 이름 오름차순. 20개 제한은 이름 정렬 뒤에 건다.
+    # 합친 뒤 이웃 수 내림차순, 같으면 관계 이름 오름차순. 20개 제한은 이름 정렬 뒤에 건다.
     ordered = sorted(groups.items(), key=lambda item: (-len(item[1]), item[0][0]))
 
     return {
         "id": selected_id,
         "name": node["name"],
         "label": node["label"],
-        "degree": sum(len(neighbors) for neighbors in groups.values()),
+        "degree": degree,
         "record": {"wins": wins, "losses": losses} if node["label"] in RECORD_LABELS else None,
         "match": node["props"] if node["label"] == "Match" else None,
         "groups": [
             {
                 "relation": relation,
                 "direction": direction,
-                "neighbors": sorted(neighbors, key=lambda x: x["name"])[:NODE_NEIGHBOR_LIMIT],
+                "neighbors": sorted(neighbors.values(), key=lambda x: x["name"])[:NODE_NEIGHBOR_LIMIT],
             }
             for (relation, direction), neighbors in ordered
         ],
