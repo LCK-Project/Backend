@@ -29,7 +29,7 @@ docker compose up --build
 벡터 DB 와 모델 캐시는 볼륨에 남으므로 다음 기동부터는 바로 뜹니다. 확인은 `curl localhost:8000/` 입니다.
 
 - 포트 바꾸기: `.env` 에 `MYSQL_HOST_PORT`(기본 3307), `API_HOST_PORT`(기본 8000)
-- 벡터 DB 재빌드: `docker compose run --rm api python build_vector_db.py --rebuild`
+- 벡터 DB 재빌드: `docker compose stop api && docker compose run --rm api python build_vector_db.py --rebuild && docker compose start api` (api 가 떠 있는 동안 같은 볼륨에 쓰면 ChromaDB 가 두 프로세스에서 열리므로 먼저 멈춘다)
 - 전부 초기화: `docker compose down -v` (MySQL·벡터 DB·모델 캐시 볼륨 삭제)
 
 ## 답변 흐름
