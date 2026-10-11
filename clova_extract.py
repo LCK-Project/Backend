@@ -1,4 +1,5 @@
 import os
+import copy
 import json
 import uuid
 import requests
@@ -318,7 +319,7 @@ def _call_clova_chat(system_prompt, user_prompt, *, temperature=0.2, max_tokens=
     return extract_content_from_clova_response(response.text), None
 
 
-def analyze_question_intent(question):
+def _analyze_question_intent_uncached(question):
     """
     질문 의도 분석(파이프라인 1단계).
     HyperCLOVA로 의도 문장과 검색 키워드 목록을 추출한다.
@@ -340,7 +341,7 @@ def analyze_question_intent(question):
 {question}
 """
 
-    content, error = _call_clova_chat(system, user, temperature=0.1, max_tokens=512)
+    content, error = _call_clova_chat(system, user, temperature=0.0, max_tokens=512)
 
     if error or not content:
         return {"intent": "", "keywords": [], "error": error}
@@ -354,6 +355,38 @@ def analyze_question_intent(question):
     except Exception as e:
         print("의도 분석 JSON 파싱 실패:", e)
         return {"intent": "", "keywords": [], "error": str(e), "raw_content": content}
+
+
+# 의도 분석 결과 캐시. LLM 키워드 추출이 호출마다 달라지면 같은 질문에도 그래프가 바뀌어
+# 그래프 좌표가 흔들린다(완료 조건 5). 같은 질문에는 같은 키워드·그래프를 돌려주도록 프로세스 안에서 고정한다.
+# functools.lru_cache 는 오류 결과까지 캐시하므로 쓰지 않고, 오류가 없는 결과만 넣는다.
+_INTENT_CACHE_MAX = 256
+_intent_cache = {}
+
+
+def analyze_question_intent(question):
+    """
+    질문 의도 분석의 캐시 래퍼. 앞뒤 공백을 지운 질문을 키로 쓰고,
+    호출자가 캐시를 바꾸지 못하도록 사본을 돌려준다.
+    반환: {"intent": str, "keywords": list[str]}
+    """
+    key = question.strip()
+
+    if key in _intent_cache:
+        return copy.deepcopy(_intent_cache[key])
+
+    result = _analyze_question_intent_uncached(key)
+
+    if "error" not in result:
+        # dict 는 삽입 순서를 지키므로 첫 키가 가장 오래된 항목이다.
+        if len(_intent_cache) >= _INTENT_CACHE_MAX:
+            del _intent_cache[next(iter(_intent_cache))]
+        _intent_cache[key] = copy.deepcopy(result)
+
+    return result
+
+
+analyze_question_intent.cache_clear = _intent_cache.clear
 
 
 def call_hyperclova_merge(question, article_answer, graph_answer, rdb_answer=""):
