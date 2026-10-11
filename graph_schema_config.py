@@ -119,3 +119,7 @@ COMMUNITY_GRAPH_SCHEMA = {
     ],
 }
 
+# 그래프 패널 시각화용 제외 기준. QUERY_EXCLUDED_* 는 다른 코드가 쓰므로 그대로 둔다.
+# Game 은 Match 단위로만 보여 주기 위해, ArticleClaim 은 엔티티 간 간선으로 펴서 보내기 위해 뺀다.
+VISUAL_EXCLUDED_LABELS = sorted(SOURCE_LABELS | {"Game", "ArticleClaim"})
+VISUAL_EXCLUDED_RELATIONS = sorted(LOW_SIGNAL_RELATIONS | {"ASSERTS", "SOURCE_ENTITY", "TARGET_ENTITY", "PLAYED_ON", "PART_OF_MATCH"})

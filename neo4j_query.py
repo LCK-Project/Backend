@@ -37,6 +37,10 @@ def _node_label(node):
         "League",
         "Tournament",
         "Match",
+        "Staff",
+        "Coach",
+        "Objective",
+        "Object",
         "Game",
         "Entity",
     ]
@@ -46,6 +50,58 @@ def _node_label(node):
             return label
 
     return node.get("entity_type") or node.get("type") or (labels[0] if labels else "Node")
+
+
+# Match 노드가 시각화 응답의 props 로 내보내는 키. 다른 키는 섞지 않는다.
+MATCH_PROP_KEYS = (
+    "match_stage",
+    "score_a",
+    "score_b",
+    "best_of",
+    "team_a_key",
+    "team_b_key",
+    "winner_key",
+)
+
+
+def build_match_name(props: dict) -> str:
+    """Match 노드에는 name 계열 속성이 없어 팀 키와 날짜로 표시명을 만든다."""
+    a = props.get("team_a_key")
+    b = props.get("team_b_key")
+    date = (props.get("match_date") or "")[:10]
+
+    if a and b:
+        name = f"{a.removeprefix('TEAM_')} vs {b.removeprefix('TEAM_')}"
+        return f"{name} · {date}" if date else name
+
+    if date:
+        return f"경기 · {date}"
+
+    return props.get("match_key") or "경기"
+
+
+def node_to_dict(node, is_seed: bool) -> dict:
+    """시각화 응답의 노드 dict. degree 는 0으로 두고 간선을 다 모은 뒤 채운다."""
+    label = _node_label(node)
+
+    if label == "Match":
+        name = build_match_name({key: node.get(key) for key in (*MATCH_PROP_KEYS, "match_date", "match_key")})
+        match_date = (node.get("match_date") or "")[:10] or None
+        props = {key: node.get(key) for key in MATCH_PROP_KEYS if node.get(key) is not None}
+    else:
+        name = _node_name(node)
+        match_date = None
+        props = {}
+
+    return {
+        "id": str(node.element_id),
+        "name": name,
+        "label": label,
+        "degree": 0,
+        "is_seed": is_seed,
+        "match_date": match_date,
+        "props": props,
+    }
 
 
 def _relation_name(rel):
