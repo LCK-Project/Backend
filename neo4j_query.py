@@ -409,6 +409,91 @@ def search_graph_knowledge(keywords, limit=100):
 
 
 # =========================
+# 노드 상세 조회 (/node)
+# =========================
+
+NODE_CYPHER = """
+MATCH (n) WHERE elementId(n) = $id
+OPTIONAL MATCH (n)-[r]-(m)
+WHERE NOT type(r) IN $excluded_relations
+AND none(label IN labels(m) WHERE label IN $excluded_labels)
+RETURN n, r, m, startNode(r) AS source
+"""
+
+NODE_NEIGHBOR_LIMIT = 20
+RECORD_LABELS = {"Team", "Player"}
+
+
+def _run_node_query(node_id: str) -> list:
+    """Cypher 실행만 맡는다. 테스트에서는 monkeypatch 로 스텁 레코드를 돌려준다."""
+    driver = get_driver()
+
+    with driver.session() as session:
+        return list(session.run(
+            NODE_CYPHER,
+            id=node_id,
+            excluded_relations=EXCLUDED_RELATIONS,
+            excluded_labels=EXCLUDED_LABELS,
+        ))
+
+
+def get_node_detail(node_id: str) -> dict | None:
+    records = _run_node_query(node_id)
+
+    if not records:
+        return None
+
+    node = node_to_dict(records[0]["n"], False)
+    selected_id = node["id"]
+
+    groups = {}
+    wins = 0
+    losses = 0
+
+    for record in records:
+        r = record["r"]
+
+        if r is None:
+            continue
+
+        relation = _relation_name(r)
+        direction = "out" if str(record["source"].element_id) == selected_id else "in"
+        neighbor = node_to_dict(record["m"], False)
+
+        groups.setdefault((relation, direction), []).append({
+            "id": neighbor["id"],
+            "name": neighbor["name"],
+            "label": neighbor["label"],
+            "role": r.get("role") if relation == "MEMBER_OF" else None,
+        })
+
+        if relation == "WON_MATCH":
+            wins += 1
+        elif relation == "LOST_MATCH":
+            losses += 1
+
+    # 이웃 수 내림차순, 같으면 관계 이름 오름차순. 20개 제한은 이름 정렬 뒤에 건다.
+    ordered = sorted(groups.items(), key=lambda item: (-len(item[1]), item[0][0]))
+
+    return {
+        "id": selected_id,
+        "name": node["name"],
+        "label": node["label"],
+        "degree": sum(len(neighbors) for neighbors in groups.values()),
+        "record": {"wins": wins, "losses": losses} if node["label"] in RECORD_LABELS else None,
+        "match": node["props"] if node["label"] == "Match" else None,
+        "groups": [
+            {
+                "relation": relation,
+                "direction": direction,
+                "neighbors": sorted(neighbors, key=lambda x: x["name"])[:NODE_NEIGHBOR_LIMIT],
+            }
+            for (relation, direction), neighbors in ordered
+        ],
+    }
+
+
+# =========================
 # 메인 함수
 # =========================
 
