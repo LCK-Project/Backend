@@ -1,5 +1,5 @@
 from connect import get_driver
-from graph_schema_config import QUERY_EXCLUDED_LABELS, QUERY_EXCLUDED_RELATIONS
+from graph_schema_config import VISUAL_EXCLUDED_LABELS, VISUAL_EXCLUDED_RELATIONS
 import os
 import re
 
@@ -182,28 +182,48 @@ def _extract_keywords(keywords):
 # 그래프 조회 Cypher
 # =========================
 
-EXCLUDED_RELATIONS = QUERY_EXCLUDED_RELATIONS
-EXCLUDED_LABELS = QUERY_EXCLUDED_LABELS
+EXCLUDED_RELATIONS = VISUAL_EXCLUDED_RELATIONS
+EXCLUDED_LABELS = VISUAL_EXCLUDED_LABELS
 
 
-KEYWORD_CYPHER = """
-MATCH (n)
+# 키워드에 매칭되는 시드 노드 n 의 조건. 구조·클레임 두 쿼리가 어긋나지 않도록 한 번만 쓴다.
+# Team 은 "한화생명" 같은 약칭을 aliases 배열에만 갖고 있어 aliases 매칭이 필요하다.
+SEED_WHERE = """
 WHERE none(label IN labels(n) WHERE label IN $excluded_labels)
 AND any(kw IN $keywords WHERE
-    toLower(coalesce(n.display_name, '')) CONTAINS kw
-    OR toLower(coalesce(n.name, '')) CONTAINS kw
+    toLower(coalesce(n.name, '')) CONTAINS kw
     OR toLower(coalesce(n.canonical_name, '')) CONTAINS kw
-    OR toLower(coalesce(n.entity_text, '')) CONTAINS kw
     OR toLower(coalesce(n.team_name, '')) CONTAINS kw
     OR toLower(coalesce(n.player_name, '')) CONTAINS kw
     OR toLower(coalesce(n.champion_name, '')) CONTAINS kw
-    OR toLower(coalesce(n.league_name, '')) CONTAINS kw
-    OR toLower(coalesce(n.tournament_name, '')) CONTAINS kw
+    OR toLower(coalesce(n.staff_name, '')) CONTAINS kw
+    OR any(a IN coalesce(n.aliases, []) WHERE toLower(a) CONTAINS kw)
 )
+"""
+
+
+# 1) 구조 간선. Game·ArticleClaim 은 제외 라벨로, 클레임 연결 관계는 제외 관계로 빠진다.
+KEYWORD_CYPHER = f"""
+MATCH (n)
+{SEED_WHERE}
 MATCH (n)-[r]-(m)
 WHERE NOT type(r) IN $excluded_relations
 AND none(label IN labels(m) WHERE label IN $excluded_labels)
 RETURN n, r, m, startNode(r) AS source, endNode(r) AS target
+LIMIT $limit
+"""
+
+
+# 2) 클레임 간선. (s)<-[:SOURCE_ENTITY]-(c:ArticleClaim)-[:TARGET_ENTITY]->(t) 를 s -> t 간선 하나로 편다.
+CLAIM_CYPHER = f"""
+MATCH (n)
+{SEED_WHERE}
+MATCH (n)-[:SOURCE_ENTITY|TARGET_ENTITY]-(c:ArticleClaim)
+MATCH (c)-[:SOURCE_ENTITY]->(s), (c)-[:TARGET_ENTITY]->(t)
+WHERE none(label IN labels(s) WHERE label IN $excluded_labels)
+AND none(label IN labels(t) WHERE label IN $excluded_labels)
+RETURN n, s, t, c.relation_type AS relation_type, c.article_key AS article_key,
+       c.evidence_text AS evidence_text, c.confidence AS confidence
 LIMIT $limit
 """
 
@@ -356,30 +376,29 @@ def search_graph_knowledge(keywords, limit=100):
         return _empty_graph_result()
 
     driver = get_driver()
+    params = {
+        "keywords": keywords,
+        "excluded_relations": EXCLUDED_RELATIONS,
+        "excluded_labels": EXCLUDED_LABELS,
+        "limit": limit,
+    }
 
     with driver.session() as session:
-        records = list(session.run(
-            KEYWORD_CYPHER,
-            keywords=keywords,
-            excluded_relations=EXCLUDED_RELATIONS,
-            excluded_labels=EXCLUDED_LABELS,
-            limit=limit,
-        ))
+        structure_records = list(session.run(KEYWORD_CYPHER, **params))
+        claim_records = list(session.run(CLAIM_CYPHER, **params))
 
-    if not records:
+    if not structure_records and not claim_records:
         print(f"DEBUG no graph match for keywords {keywords}")
         return _empty_graph_result(keywords)
 
-    seed_ids = {str(record["n"].element_id) for record in records}
-    graph = records_to_graph(records, [], seed_ids)
-    facts = records_to_facts(records, [])
+    seed_ids = {str(record["n"].element_id) for record in structure_records + claim_records}
+    graph = records_to_graph(structure_records, claim_records, seed_ids)
+    facts = records_to_facts(structure_records, claim_records)
     context = format_graph_facts(facts)
 
     print("DEBUG graph nodes:", len(graph["nodes"]))
     print("DEBUG graph links:", len(graph["links"]))
     print("DEBUG graph facts:", len(facts))
-    print("DEBUG sample nodes:", graph["nodes"][:5])
-    print("DEBUG sample links:", graph["links"][:5])
 
     return {
         "keywords": keywords,
