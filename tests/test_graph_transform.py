@@ -26,7 +26,7 @@ def test_staff_label_and_name():
 
 
 from neo4j_query import records_to_graph, records_to_facts, format_graph_facts
-from tests.stubs import StubNode, StubRel, structure_record, claim_record
+from tests.stubs import StubRel, structure_record, claim_record
 
 HLE = StubNode("4:x:1", ["Entity", "Team"], {"canonical_name": "한화생명 이스포츠"})
 ZEKA = StubNode("4:x:3", ["Entity", "Player"], {"canonical_name": "제카"})
