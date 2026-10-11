@@ -1,5 +1,5 @@
-import sqlite3
 import os
+import sqlite3
 
 print("🚨 create_rdb.py 실행됨")
 

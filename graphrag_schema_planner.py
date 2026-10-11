@@ -18,7 +18,6 @@ from graph_schema_config import (
     SOURCE_LABELS,
 )
 
-
 DEFAULT_FILENAMES = {
     "node_counts": "neo4j_query_table_data_2026-6-27.csv",
     "node_properties": "neo4j_query_table_data_2026-6-27 (1).csv",

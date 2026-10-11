@@ -6,6 +6,7 @@ RDB(정형 데이터)는 선수/팀/경기/게임/스탯 등 수치·집계 질�
 """
 
 import os
+
 import pymysql
 from dotenv import load_dotenv
 
@@ -41,6 +42,6 @@ if __name__ == "__main__":
     conn = get_connection()
     with conn.cursor() as cur:
         cur.execute("SHOW TABLES")
-        tables = [list(row.values())[0] for row in cur.fetchall()]
+        tables = [next(iter(row.values())) for row in cur.fetchall()]
     conn.close()
     print(f"espo 연결 성공. 테이블 {len(tables)}개:", tables)

@@ -1,6 +1,7 @@
 from neo4j_query import build_match_name, node_to_dict
 from tests.stubs import StubNode
 
+
 def test_match_name_with_both_teams():
     assert build_match_name({"team_a_key": "TEAM_GEN", "team_b_key": "TEAM_HLE", "match_date": "2025-09-06T06:09:11"}) == "GEN vs HLE · 2025-09-06"
 def test_match_name_without_team_keys():
@@ -25,8 +26,8 @@ def test_staff_label_and_name():
     assert d["label"] == "Staff" and d["name"] == "김정수"
 
 
-from neo4j_query import records_to_graph, records_to_facts, format_graph_facts
-from tests.stubs import StubRel, structure_record, claim_record
+from neo4j_query import format_graph_facts, records_to_facts, records_to_graph
+from tests.stubs import StubRel, claim_record, structure_record
 
 HLE = StubNode("4:x:1", ["Entity", "Team"], {"canonical_name": "한화생명 이스포츠"})
 ZEKA = StubNode("4:x:3", ["Entity", "Player"], {"canonical_name": "제카"})

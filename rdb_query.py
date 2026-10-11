@@ -16,7 +16,6 @@ import re
 
 from mysql_connect import get_connection
 
-
 # =========================
 # 키워드 정리
 # =========================
@@ -125,9 +124,11 @@ def _player_overall_facts(cur, player):
     name = player["player_name"]
     pos = player.get("position") or "-"
     return [
-        f"(Player) {name}[{pos}] — {row['games']}게임, 평균 KDA {row['kda']} "
-        f"(K {row['avg_k']} / D {row['avg_d']} / A {row['avg_a']}), "
-        f"평균 CS {row['avg_cs']}, 평균 골드 {row['avg_gold']}"
+        (
+            f"(Player) {name}[{pos}] — {row['games']}게임, 평균 KDA {row['kda']} "
+            f"(K {row['avg_k']} / D {row['avg_d']} / A {row['avg_a']}), "
+            f"평균 CS {row['avg_cs']}, 평균 골드 {row['avg_gold']}"
+        )
     ]
 
 
@@ -303,7 +304,7 @@ def _text_to_sql_facts(cur, question, entity_hint):
     try:
         cur.execute(safe_sql)
         rows = cur.fetchmany(50)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print("DEBUG text-to-sql 실행 실패:", e)
         return [], safe_sql
 
@@ -349,7 +350,7 @@ def search_rdb_knowledge(question, keywords, max_facts=40):
 
     try:
         conn = get_connection()
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print("DEBUG RDB 연결 실패:", e)
         return _empty_rdb_result(kw_list)
 

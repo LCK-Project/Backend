@@ -1,5 +1,6 @@
 import build_vector_db as b
 
+
 def row(i, content, published_at="2025-09-07 00:00:00", title="t", url="u", news_id="n"):
     return {"article_id": i, "news_id": news_id, "title": title, "content": content, "published_at": published_at, "url": url}
 
