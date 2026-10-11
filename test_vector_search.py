@@ -1,13 +1,8 @@
-import chromadb
-from sentence_transformers import SentenceTransformer
+from chroma_client import COLLECTION, get_client, get_model
 
-model = SentenceTransformer("jhgan/ko-sroberta-multitask")
+model = get_model()
 
-client = chromadb.PersistentClient(path="./chroma_db")
-
-collection = client.get_collection(
-    name="lol_esports_articles"
-)
+collection = get_client().get_collection(name=COLLECTION)
 
 query = "젠지 우승 요인을 알려줘"
 
