@@ -15,7 +15,6 @@ import datetime
 import os
 import sys
 import time
-
 from chunk import split_text_overlap
 
 CHUNK_SIZE = 1000
@@ -112,14 +111,14 @@ def _count_articles():
 
     try:
         conn = get_connection()
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print(f"[build_vector_db] MySQL 연결 실패, 재시도: {e}", flush=True)
         return 0
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT COUNT(*) AS n FROM article")
             return int(cur.fetchone()["n"])
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print(f"[build_vector_db] article 조회 실패, 재시도: {e}", flush=True)
         return 0
     finally:
@@ -129,8 +128,9 @@ def _count_articles():
 def _delete_collection(client, name):
     try:
         client.delete_collection(name)
-    except Exception:
-        pass  # 없으면 지울 것도 없다
+    except Exception as e:  # noqa: BLE001
+        # 없으면 지울 것도 없다
+        print(f"[build_vector_db] 기존 컬렉션 삭제 건너뜀: {e}", flush=True)
 
 
 def main(argv) -> int:
@@ -180,7 +180,7 @@ def main(argv) -> int:
     cc.write_marker({
         "article_count": count,
         "chunk_count": chunk_count,
-        "built_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "built_at": datetime.datetime.now(datetime.UTC).isoformat(),
     })
     log(f"ChromaDB 빌드 완료: {chunk_count} 청크 / {article_count} 기사")
     return 0

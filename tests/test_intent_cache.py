@@ -1,5 +1,6 @@
 import clova_extract as ce
 
+
 def _fake_calls(answers):
     calls = []
     def fake(system, user, *, temperature=0.2, max_tokens=1024):

@@ -12,10 +12,10 @@
 
 from clova_extract import (
     analyze_question_intent,
-    call_hyperclova_summary,
     call_hyperclova_kg_answer,
-    call_hyperclova_rdb_answer,
     call_hyperclova_merge,
+    call_hyperclova_rdb_answer,
+    call_hyperclova_summary,
 )
 from neo4j_query import search_graph_knowledge
 
@@ -28,7 +28,7 @@ def _search_rdb_safe(question, keywords, graph_limit=40):
     try:
         from rdb_query import search_rdb_knowledge
         return search_rdb_knowledge(question, keywords, max_facts=graph_limit)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print("DEBUG RDB search failed:", e)
         return {
             "keywords": [], "entities": {"players": [], "teams": []},
@@ -44,7 +44,7 @@ def _search_articles_safe(question, top_k=3):
     try:
         from rag_answer import search_articles
         return search_articles(question, top_k=top_k)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print("DEBUG article search failed:", e)
         return []
 

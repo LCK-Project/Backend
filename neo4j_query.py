@@ -1,7 +1,8 @@
-from connect import get_driver
-from graph_schema_config import VISUAL_EXCLUDED_LABELS, VISUAL_EXCLUDED_RELATIONS
 import os
 import re
+
+from connect import get_driver
+from graph_schema_config import VISUAL_EXCLUDED_LABELS, VISUAL_EXCLUDED_RELATIONS
 
 print("### LOADED neo4j_query.py ###", os.path.abspath(__file__))
 

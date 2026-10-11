@@ -1,7 +1,9 @@
-import os
+import contextlib
 import copy
 import json
+import os
 import uuid
+
 import requests
 from dotenv import load_dotenv
 
@@ -66,8 +68,9 @@ def extract_content_from_clova_response(response_text):
     최종 content만 안정적으로 추출하는 함수
     """
 
-    # 1) 혹시 일반 JSON 응답이면 먼저 처리
-    try:
+    # 1) 혹시 일반 JSON 응답이면 먼저 처리.
+    # 스트리밍 응답이면 여기서 항상 실패하는 것이 정상 경로라 로그 없이 2) 로 넘긴다.
+    with contextlib.suppress(Exception):
         data = json.loads(response_text)
 
         if "result" in data:
@@ -83,9 +86,6 @@ def extract_content_from_clova_response(response_text):
 
         if "choices" in data:
             return data["choices"][0]["message"]["content"]
-
-    except:
-        pass
 
     # 2) text/event-stream 응답 처리
     contents = []
@@ -109,7 +109,7 @@ def extract_content_from_clova_response(response_text):
                 msg = obj["message"]
 
                 # content가 있으면 우선 사용
-                if "content" in msg and msg["content"]:
+                if msg.get("content"):
                     contents.append(msg["content"])
 
                 # thinkingContent는 최종 답변이 아니라 중간 추론일 수 있으므로 제외
@@ -126,10 +126,11 @@ def extract_content_from_clova_response(response_text):
 
             elif "choices" in obj:
                 delta = obj["choices"][0].get("delta", {})
-                if "content" in delta and delta["content"]:
+                if delta.get("content"):
                     contents.append(delta["content"])
 
-        except:
+        except Exception as e:  # noqa: BLE001
+            print(f"CLOVA 스트리밍 줄 파싱 실패, 건너뜀: {e}")
             continue
 
     final_text = "".join(contents).strip()
@@ -156,7 +157,7 @@ def parse_json_only(text):
     text = text[start:]
 
     decoder = json.JSONDecoder()
-    obj, end = decoder.raw_decode(text)
+    obj, _ = decoder.raw_decode(text)
 
     return obj
 
@@ -222,7 +223,7 @@ def extract_entities_with_clova(chunk):
     try:
         result = parse_json_only(content)
         return result
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print("JSON 파싱 실패:", e)
         return {
             "players": [],
@@ -352,7 +353,7 @@ def _analyze_question_intent_uncached(question):
             result["keywords"] = []
         result.setdefault("intent", "")
         return result
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print("의도 분석 JSON 파싱 실패:", e)
         return {"intent": "", "keywords": [], "error": str(e), "raw_content": content}
 

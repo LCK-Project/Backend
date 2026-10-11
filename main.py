@@ -6,20 +6,19 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8")
 
 print("🚨 지금 실행되는 main.py 맞음")
-from neo4j_extract import save_to_neo4j
-
 import json
 import os
-
-from dictionary import normalize_result
 from chunk import split_text_overlap
+
 from clova_extract import extract_entities_with_clova
+from dictionary import normalize_result
+from neo4j_extract import save_to_neo4j
 
 JSON_PATH = "kmib_lck_yunminsop.json"
 
 if not os.path.exists(JSON_PATH):
     print(f"❌ JSON 파일을 찾을 수 없습니다: {JSON_PATH}")
-    exit()
+    sys.exit()
 
 with open(JSON_PATH, "r", encoding="utf-8") as f:
     articles = json.load(f)
