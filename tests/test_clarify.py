@@ -243,7 +243,7 @@ def _stub_full_pipeline(monkeypatch, seen):
     monkeypatch.setattr(pipeline, "scope_options", _options)
     monkeypatch.setattr(pipeline, "_search_articles_safe", lambda q, top_k=3, date_range=None: seen.append(("articles", q)) or [])
     monkeypatch.setattr(pipeline, "search_graph_knowledge", lambda kw, limit=100, date_range=None: {"facts": [], "context": "", "keywords": kw, "graph": {"nodes": [], "links": []}})
-    monkeypatch.setattr(pipeline, "_search_rdb_safe", lambda q, kw, graph_limit=40: seen.append(("rdb", q)) or {"keywords": [], "entities": {"players": [], "teams": []}, "facts": [], "context": "", "sql": None})
+    monkeypatch.setattr(pipeline, "_search_rdb_safe", lambda q, kw, graph_limit=40, date_range=None: seen.append(("rdb", q)) or {"keywords": [], "entities": {"players": [], "teams": []}, "facts": [], "context": "", "sql": None})
     monkeypatch.setattr(pipeline, "call_hyperclova_kg_answer", lambda q, c: seen.append(("kg", q)) or "kg")
     monkeypatch.setattr(pipeline, "call_hyperclova_rdb_answer", lambda q, c: "rdb")
     monkeypatch.setattr(pipeline, "call_hyperclova_merge", lambda q, a, g, r: seen.append(("merge", q)) or "final")
@@ -306,7 +306,7 @@ def test_pipeline_scope_passes_date_range_and_keywords(monkeypatch):
         return {"facts": [], "context": "", "keywords": kw, "graph": {"nodes": [], "links": []}}
     monkeypatch.setattr(pipeline, "_search_articles_safe", articles)
     monkeypatch.setattr(pipeline, "search_graph_knowledge", graph)
-    monkeypatch.setattr(pipeline, "_search_rdb_safe", lambda q, kw, graph_limit=40: {"keywords": [], "entities": {"players": [], "teams": []}, "facts": [], "context": "", "sql": None})
+    monkeypatch.setattr(pipeline, "_search_rdb_safe", lambda q, kw, graph_limit=40, date_range=None: {"keywords": [], "entities": {"players": [], "teams": []}, "facts": [], "context": "", "sql": None})
     monkeypatch.setattr(pipeline, "call_hyperclova_kg_answer", lambda q, c: "kg")
     monkeypatch.setattr(pipeline, "call_hyperclova_rdb_answer", lambda q, c: "rdb")
     monkeypatch.setattr(pipeline, "call_hyperclova_merge", lambda q, a, g, r: "final")
@@ -322,7 +322,7 @@ def test_pipeline_opponent_scope_adds_keyword(monkeypatch):
         seen["graph"] = (kw, date_range)
         return {"facts": [], "context": "", "keywords": kw, "graph": {"nodes": [], "links": []}}
     monkeypatch.setattr(pipeline, "search_graph_knowledge", graph)
-    monkeypatch.setattr(pipeline, "_search_rdb_safe", lambda q, kw, graph_limit=40: {"keywords": [], "entities": {"players": [], "teams": []}, "facts": [], "context": "", "sql": None})
+    monkeypatch.setattr(pipeline, "_search_rdb_safe", lambda q, kw, graph_limit=40, date_range=None: {"keywords": [], "entities": {"players": [], "teams": []}, "facts": [], "context": "", "sql": None})
     monkeypatch.setattr(pipeline, "call_hyperclova_kg_answer", lambda q, c: "kg")
     monkeypatch.setattr(pipeline, "call_hyperclova_rdb_answer", lambda q, c: "rdb")
     monkeypatch.setattr(pipeline, "call_hyperclova_merge", lambda q, a, g, r: "final")
