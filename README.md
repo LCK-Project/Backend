@@ -43,6 +43,21 @@ docker compose up --build
            └→ [LLM #5] 세 답변 통합 → 최종 답변
 ```
 
+### 범위 되묻기 (한 번)
+
+"T1의 전략이 궁금해"처럼 시즌·대회에 따라 답이 달라지는데 범위가 없는 질문은 바로 답하지 않고 한 번 되묻습니다.
+의도 분석(LLM #1)이 `needs_scope`·`scope_axis` 를 함께 내고, 질문에 연도·시즌·대회 토큰이 없으면 나머지 검색과 LLM 호출을 건너뛰고
+아래 응답을 돌려줍니다. 선택지는 MySQL `tournament`·`season` 테이블에 실제 있는 이름만 최신순으로 넣습니다.
+
+```json
+{ "type": "clarify", "question": "T1의 전략이 궁금해", "intent": "...",
+  "clarify": { "axis": "tournament", "prompt": "어느 대회 기준으로 알아볼까요?", "options": ["2026 LCK Rounds 3-4", "..."] } }
+```
+
+프론트는 고른 선택지를 질문에 붙여(`T1의 전략이 궁금해 (2025 LCK Cup 기준)`) `{"question": "...", "skip_clarify": true}` 로 다시 보냅니다.
+`skip_clarify` 가 true 면 항상 답하므로 되묻기는 질문당 한 번입니다. 일반 답변 응답에는 `"type": "answer"` 가 붙습니다.
+판정 규칙은 `clarify.py`, 설계는 `docs/specs/2026-11-03-clarify-design.md` 에 있습니다.
+
 ## 디렉터리 구성
 
 | 파일 | 역할 |
