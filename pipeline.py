@@ -24,14 +24,14 @@ from clova_extract import (
 from neo4j_query import search_graph_knowledge
 
 
-def _search_rdb_safe(question, keywords, graph_limit=40):
+def _search_rdb_safe(question, keywords, graph_limit=40, date_range=None):
     """
     RDB(espo) 통계 검색. 연결/조회 실패가 전체 답변을 죽이지 않도록 감싼다.
     (pymysql 등은 모듈 import 시점 부담이 있어 지연 import)
     """
     try:
         from rdb_query import search_rdb_knowledge
-        return search_rdb_knowledge(question, keywords, max_facts=graph_limit)
+        return search_rdb_knowledge(question, keywords, max_facts=graph_limit, date_range=date_range)
     except Exception as e:  # noqa: BLE001
         print("DEBUG RDB search failed:", e)
         return {
@@ -106,7 +106,7 @@ def run_pipeline(question, top_k=3, graph_limit=100, skip_clarify=False, scope=N
     graph_answer = call_hyperclova_kg_answer(question, kg_result["context"])
 
     # 4) 정형 통계 검색(MySQL espo) → RDB 기반 답변 (LLM #4)
-    rdb_result = _search_rdb_safe(question, keywords)
+    rdb_result = _search_rdb_safe(question, keywords, date_range=date_range)
     rdb_answer = call_hyperclova_rdb_answer(question, rdb_result["context"])
 
     # 5) 세 답변 통합 (LLM #5)
