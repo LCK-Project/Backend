@@ -10,18 +10,18 @@
              └→ [LLM #5] 세 답변 통합 → 최종 답변 + 그래프
 """
 
-from clarify import (
+from app.clarify import (
     decide_clarification, has_recent_token, latest_season, refine_recent_question,
     scope_date_range, scope_keywords, scope_options,
 )
-from clova_extract import (
+from app.llm.clova_extract import (
     analyze_question_intent,
     call_hyperclova_kg_answer,
     call_hyperclova_merge,
     call_hyperclova_rdb_answer,
     call_hyperclova_summary,
 )
-from neo4j_query import search_graph_knowledge
+from app.search.neo4j_query import search_graph_knowledge
 
 
 def _search_rdb_safe(question, keywords, graph_limit=40, date_range=None):
@@ -30,7 +30,7 @@ def _search_rdb_safe(question, keywords, graph_limit=40, date_range=None):
     (pymysql 등은 모듈 import 시점 부담이 있어 지연 import)
     """
     try:
-        from rdb_query import search_rdb_knowledge
+        from app.search.rdb_query import search_rdb_knowledge
         return search_rdb_knowledge(question, keywords, max_facts=graph_limit, date_range=date_range)
     except Exception as e:  # noqa: BLE001
         print("DEBUG RDB search failed:", e)
@@ -46,7 +46,7 @@ def _search_articles_safe(question, top_k=3, date_range=None):
     (rag_answer는 clova_extract·chroma_client 를 끌어오므로 지연 import)
     """
     try:
-        from rag_answer import search_articles
+        from app.search.rag_answer import search_articles
         return search_articles(question, top_k=top_k, date_range=date_range)
     except Exception as e:  # noqa: BLE001
         print("DEBUG article search failed:", e)

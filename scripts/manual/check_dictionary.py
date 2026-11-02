@@ -1,6 +1,6 @@
 print("🚨 test_dictionary.py 실행됨")
 
-from dictionary import normalize_result
+from scripts.dictionary import normalize_result
 
 test_result = {
     "players": ["페이커", "이상혁", "기인", "김기인"],

@@ -5,16 +5,17 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
     sys.stderr.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
 
-print("🚨 지금 실행되는 main.py 맞음")
+print("🚨 지금 실행되는 build_graph.py 맞음")
 import json
 import os
-from chunk import split_text_overlap
+from app.common.chunk import split_text_overlap
 
-from clova_extract import extract_entities_with_clova
-from dictionary import normalize_result
-from neo4j_extract import save_to_neo4j
+from app.llm.clova_extract import extract_entities_with_clova
+from scripts.dictionary import normalize_result
+from scripts.neo4j_extract import save_to_neo4j
+from scripts.paths import ARTICLES_JSON
 
-JSON_PATH = "kmib_lck_yunminsop.json"
+JSON_PATH = ARTICLES_JSON
 
 if not os.path.exists(JSON_PATH):
     print(f"❌ JSON 파일을 찾을 수 없습니다: {JSON_PATH}")

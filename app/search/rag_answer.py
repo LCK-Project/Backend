@@ -1,8 +1,8 @@
 print("🚨 rag_answer.py 실행됨")
 
-from chroma_client import COLLECTION, get_client, get_model
-from clova_extract import call_hyperclova_summary
-from text_utils import clean_text
+from app.db.chroma_client import COLLECTION, get_client, get_model
+from app.llm.clova_extract import call_hyperclova_summary
+from app.common.text_utils import clean_text
 
 
 def _get_collection():

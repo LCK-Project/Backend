@@ -1,4 +1,4 @@
-import build_vector_db as b
+from scripts import build_vector_db as b
 
 
 def row(i, content, published_at="2025-09-07 00:00:00", title="t", url="u", news_id="n"):

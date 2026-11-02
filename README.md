@@ -29,7 +29,7 @@ docker compose up --build
 벡터 DB 와 모델 캐시는 볼륨에 남으므로 다음 기동부터는 바로 뜹니다. 확인은 `curl localhost:8000/` 입니다.
 
 - 포트 바꾸기: `.env` 에 `MYSQL_HOST_PORT`(기본 3307), `API_HOST_PORT`(기본 8000)
-- 벡터 DB 재빌드: `docker compose stop api && docker compose run --rm api python build_vector_db.py --rebuild && docker compose start api` (api 가 떠 있는 동안 같은 볼륨에 쓰면 ChromaDB 가 두 프로세스에서 열리므로 먼저 멈춘다)
+- 벡터 DB 재빌드: `docker compose stop api && docker compose run --rm api python -m scripts.build_vector_db --rebuild && docker compose start api` (api 가 떠 있는 동안 같은 볼륨에 쓰면 ChromaDB 가 두 프로세스에서 열리므로 먼저 멈춘다)
 - 전부 초기화: `docker compose down -v` (MySQL·벡터 DB·모델 캐시 볼륨 삭제)
 
 ## 답변 흐름
@@ -73,28 +73,48 @@ docker compose up --build
 "요즘·최근·현재·지금·올해·이번" 이 있으면 되묻지 않고 질문에 최신 시즌을 붙여 답합니다.
 `scope` 는 검색에도 적용됩니다. 시즌·대회·패치는 경기(Neo4j Match 노드)와 기사의 날짜 범위로, 상대 팀·챔피언은 그래프 검색 키워드로 씁니다.
 기사 데이터는 현재 2025년 것만 있어서 다른 해를 고르면 기사 근거가 비는 게 정상입니다.
-판정 규칙은 `clarify.py`, 설계는 `docs/specs/2026-11-03-clarify-design.md` 에 있습니다.
+판정 규칙은 `app/clarify.py`, 설계는 `docs/specs/2026-11-03-clarify-design.md` 에 있습니다.
 
 ## 디렉터리 구성
 
-| 파일 | 역할 |
-|------|------|
-| `api_server.py` | FastAPI 서버. `POST /ask` 엔드포인트 |
-| `pipeline.py` | 질의응답 파이프라인 오케스트레이터 |
-| `clova_extract.py` | HyperCLOVA X 호출(의도 분석, 엔티티 추출, 답변 생성, Text-to-SQL) |
-| `rag_answer.py` | ChromaDB 기사 검색 + 기사 기반 답변 |
-| `neo4j_query.py`, `kg_answer.py` | Neo4j 그래프 검색 + 그래프 기반 답변 |
-| `rdb_query.py`, `mysql_connect.py` | MySQL(espo) 통계 검색 |
-| `connect.py`, `neo4j_extract.py` | Neo4j 연결 및 추출 결과 저장 |
-| `main.py` | 기사 → 청크 → 엔티티 추출 → Neo4j 적재 (그래프 구축 스크립트) |
-| `make_vector_data.py`, `build_vector_db.py` | 기사 청킹 → 임베딩 → ChromaDB 구축 |
-| `chunk.py`, `dictionary.py`, `alias_dictionary.csv` | 텍스트 청킹, 별칭 정규화 사전 |
-| `graph_schema_config.py`, `graphrag_schema_planner.py` | 그래프 스키마 기준표와 정리 계획 생성기 (`docs/` 참고) |
-| `news_api.py` | 빅카인즈 뉴스 API 수집 |
-| `schema.sql`, `create_rdb.py`, `insert_articles_to_rdb.py`, `check_rdb.py` | SQLite(`lck_kg.db`) 기사 적재용 보조 스크립트 |
-| `Dump_Espo.sql` | MySQL `espo` 데이터베이스 덤프(선수/팀/경기 통계) |
-| `kmib_lck_yunminsop.json` | 수집된 기사 원본 데이터 |
-| `test_*.py` | 각 모듈 단독 확인용 스크립트 |
+```text
+Backend/
+├── app/                      # API 서버와 질의응답 파이프라인 (서버가 import 하는 코드만)
+│   ├── api_server.py         # FastAPI 서버. POST /ask, GET /node
+│   ├── pipeline.py           # 질의응답 파이프라인 오케스트레이터
+│   ├── clarify.py            # 범위 되묻기 판정과 선택지
+│   ├── llm/
+│   │   └── clova_extract.py  # HyperCLOVA X 호출(의도 분석, 엔티티 추출, 답변 생성, Text-to-SQL)
+│   ├── search/
+│   │   ├── neo4j_query.py    # Neo4j 그래프 검색, 노드 상세
+│   │   ├── rag_answer.py     # ChromaDB 기사 검색 + 기사 기반 답변
+│   │   ├── rdb_query.py      # MySQL(espo) 통계 검색 (고정 쿼리 + Text-to-SQL)
+│   │   └── kg_answer.py      # 그래프 기반 답변 단독 호출
+│   ├── db/
+│   │   ├── connect.py        # Neo4j 드라이버
+│   │   ├── mysql_connect.py  # MySQL 연결
+│   │   └── chroma_client.py  # ChromaDB 클라이언트, 임베딩 모델
+│   └── common/
+│       ├── text_utils.py     # HTML 엔티티 정리 등 문자열 유틸
+│       ├── chunk.py          # 텍스트 청킹
+│       └── graph_schema_config.py  # 그래프 스키마 기준표 (시각화 제외 라벨·관계)
+├── scripts/                  # 오프라인 구축·점검 스크립트 (저장소 루트에서 python -m 으로 실행)
+│   ├── paths.py              # data/·docs/ 경로 상수
+│   ├── build_vector_db.py    # MySQL article → ChromaDB (컨테이너 기동 시 자동 실행)
+│   ├── build_graph.py        # 기사 → 청크 → 엔티티 추출 → Neo4j 적재
+│   ├── neo4j_extract.py      # 추출 결과 Neo4j 저장
+│   ├── dictionary.py         # 별칭 정규화 사전 로더
+│   ├── make_vector_data.py   # 기사 청크 JSON 생성
+│   ├── news_api.py           # 빅카인즈 뉴스 API 수집
+│   ├── graphrag_schema_planner.py  # 그래프 스키마 정리 계획 생성기
+│   ├── sqlite/               # SQLite(lck_kg.db) 기사 적재용 보조 스크립트
+│   └── manual/               # 사람이 직접 돌려 보는 확인 스크립트 (pytest 대상 아님)
+├── data/                     # 데이터 파일 (기사 원본, 별칭 사전, 옛 MySQL 덤프, SQLite 등)
+├── tests/                    # pytest 단위 테스트
+└── docs/                     # 설계 문서, 계획서, 스키마 정리 계획
+```
+
+MySQL 컨테이너가 적재하는 덤프는 저장소 밖 상위 폴더의 `Dump20261027.sql` 입니다(`docker-compose.yml`). `data/Dump_Espo.sql` 은 이전 스키마 덤프입니다.
 
 ## 사전 준비
 
@@ -146,8 +166,8 @@ pip install -r requirements.txt
 
 ```bash
 mysql -u root -p -e "CREATE DATABASE espo CHARACTER SET utf8mb4;"
-mysql -u root -p espo < Dump_Espo.sql
-python mysql_connect.py        # 연결 확인
+mysql -u root -p espo < ../Dump20261027.sql
+python -m app.db.mysql_connect   # 연결 확인
 ```
 
 #### 2. 벡터 DB(ChromaDB) 구축
@@ -155,8 +175,8 @@ python mysql_connect.py        # 연결 확인
 MySQL `article` 테이블의 기사를 읽어 만들므로 1번이 먼저 끝나 있어야 합니다.
 
 ```bash
-python build_vector_db.py --rebuild   # MySQL article → ./chroma_db (CHROMA_PATH 로 경로 변경)
-python test_vector_search.py          # 검색 확인
+python -m scripts.build_vector_db --rebuild      # MySQL article → ./chroma_db (CHROMA_PATH 로 경로 변경)
+python -m scripts.manual.check_vector_search     # 검색 확인
 ```
 
 `--if-missing` 을 주면 완료 마커(`chroma_db/.complete`)의 기사 건수가 현재와 같을 때 건너뜁니다.
@@ -166,14 +186,14 @@ python test_vector_search.py          # 검색 확인
 기사를 청킹하고 HyperCLOVA 로 엔티티·관계를 추출해 Neo4j 에 적재합니다. LLM 호출이 많아 시간이 오래 걸립니다.
 
 ```bash
-python main.py
-python test_neo4j_query.py     # 조회 확인
+python -m scripts.build_graph
+python -m scripts.manual.check_neo4j_query   # 조회 확인
 ```
 
 ### 서버 실행
 
 ```bash
-uvicorn api_server:app --host 0.0.0.0 --port 8000 --reload
+uvicorn app.api_server:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 - 상태 확인: `GET http://localhost:8000/`

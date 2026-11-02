@@ -1,6 +1,6 @@
-from neo4j_query import node_to_dict
+from app.search.neo4j_query import node_to_dict
 from tests.stubs import StubNode
-from text_utils import clean_text
+from app.common.text_utils import clean_text
 
 
 def test_clean_text_unescapes_entities():

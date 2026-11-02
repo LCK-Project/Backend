@@ -5,6 +5,8 @@ from typing import Any
 import requests
 from dotenv import load_dotenv
 
+from scripts.paths import ARTICLES_JSON
+
 load_dotenv()
 
 params: dict[str, Any] = {
@@ -66,7 +68,7 @@ if response.status_code == 200:
 
     documents = return_object.get("documents", [])
 
-    with open("kmib_lck_yunminsop.json", "w", encoding="utf-8") as f:
+    with open(ARTICLES_JSON, "w", encoding="utf-8") as f:
         json.dump(documents, f, ensure_ascii=False, indent=2)
 
     print("저장 완료: kmib_lck_yunminsop.json")

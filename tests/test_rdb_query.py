@@ -1,4 +1,4 @@
-import rdb_query as r
+from app.search import rdb_query as r
 
 
 class FakeCursor:

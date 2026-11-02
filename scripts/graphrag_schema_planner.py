@@ -4,7 +4,7 @@ import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from graph_schema_config import (
+from app.common.graph_schema_config import (
     ARTICLE_GRAPH_LABELS,
     COMMUNITY_GRAPH_SCHEMA,
     DOMAIN_LABELS,
@@ -17,6 +17,7 @@ from graph_schema_config import (
     NORMALIZATION_TARGET_LABELS,
     SOURCE_LABELS,
 )
+from scripts.paths import DATA_DIR, DOCS_DIR
 
 DEFAULT_FILENAMES = {
     "node_counts": "neo4j_query_table_data_2026-6-27.csv",
@@ -574,8 +575,8 @@ def main():
     parser.add_argument("--node-counts", type=Path, default=_find_default_file("node_counts"))
     parser.add_argument("--node-properties", type=Path, default=_find_default_file("node_properties"))
     parser.add_argument("--relationships", type=Path, default=_find_default_file("relationships"))
-    parser.add_argument("--out-json", type=Path, default=Path("graphrag_schema_plan.json"))
-    parser.add_argument("--out-md", type=Path, default=Path("graphrag_schema_plan.md"))
+    parser.add_argument("--out-json", type=Path, default=DATA_DIR / "graphrag_schema_plan.json")
+    parser.add_argument("--out-md", type=Path, default=DOCS_DIR / "graphrag_schema_plan.md")
 
     args = parser.parse_args()
 

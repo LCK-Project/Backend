@@ -1,6 +1,6 @@
-import clova_extract as ce
-import pipeline
-from clarify import (
+from app.llm import clova_extract as ce
+from app import pipeline
+from app.clarify import (
     PROMPTS, TEMPLATES, TOPIC_PROMPT_NO_SUBJECT, TOPICS, already_scoped, decide_clarification,
     has_recent_token, has_scope_token, refine_recent_question, scope_options,
 )
@@ -122,7 +122,7 @@ def test_templates_have_both_placeholders():
 # ---------- scope_options ----------
 
 def test_topic_options_are_fixed_and_do_not_touch_db(monkeypatch):
-    import clarify
+    from app import clarify
     def boom(*a, **k):
         raise AssertionError("DB 호출 금지")
     monkeypatch.setattr(clarify, "_query", boom)
@@ -131,7 +131,7 @@ def test_topic_options_are_fixed_and_do_not_touch_db(monkeypatch):
     assert scope_options("topic", None, None) == TOPICS[None]
 
 def test_opponent_options_exclude_subject(monkeypatch):
-    import clarify
+    from app import clarify
     def fake(sql, params=()):
         if "entityalias" in sql:
             return []  # 별칭 조회는 못 찾음 → 이름 포함 관계로만 뺀다
@@ -142,7 +142,7 @@ def test_opponent_options_exclude_subject(monkeypatch):
 
 def test_opponent_options_exclude_subject_via_alias(monkeypatch):
     # "T1" 으로 물었는데 DB 팀 이름은 "티원" 인 경우: 별칭 테이블로 같은 팀을 찾아 뺀다
-    import clarify
+    from app import clarify
     seen = []
     def fake(sql, params=()):
         if "entityalias" in sql:
@@ -154,7 +154,7 @@ def test_opponent_options_exclude_subject_via_alias(monkeypatch):
     assert seen == [("%T1%", "%T1%", "%t1%")]
 
 def test_opponent_options_alias_lookup_failure_still_returns_teams(monkeypatch):
-    import clarify
+    from app import clarify
     def fake(sql, params=()):
         if "entityalias" in sql:
             raise RuntimeError("alias table down")
@@ -163,12 +163,12 @@ def test_opponent_options_alias_lookup_failure_still_returns_teams(monkeypatch):
     assert scope_options("opponent", "T1", "team") == ["KT 롤스터", "티원"]
 
 def test_stage_options_are_korean_labels(monkeypatch):
-    import clarify
+    from app import clarify
     monkeypatch.setattr(clarify, "_query", lambda sql, params=(): [{"name": "Regular"}, {"name": "Playoffs"}])
     assert scope_options("stage") == ["정규 시즌", "플레이오프"]
 
 def test_champion_options_fall_back_to_overall_when_player_unknown(monkeypatch):
-    import clarify
+    from app import clarify
     calls = []
     def fake(sql, params=()):
         calls.append(sql)
@@ -181,7 +181,7 @@ def test_champion_options_fall_back_to_overall_when_player_unknown(monkeypatch):
     assert not any("gp.player_id IN" in c for c in calls)
 
 def test_champion_options_use_player_ids_when_found(monkeypatch):
-    import clarify
+    from app import clarify
     calls = []
     def fake(sql, params=()):
         calls.append((sql, params))
@@ -193,7 +193,7 @@ def test_champion_options_use_player_ids_when_found(monkeypatch):
     assert any("gp.player_id IN" in s and p == (7,) for s, p in calls)
 
 def test_db_failure_returns_empty(monkeypatch):
-    import clarify
+    from app import clarify
     def boom(sql, params=()):
         raise RuntimeError("db down")
     monkeypatch.setattr(clarify, "_query", boom)
@@ -294,7 +294,7 @@ def test_pipeline_recent_question_is_not_clarified_even_if_llm_asks(monkeypatch)
     assert pipeline.run_pipeline("요즘 메타 어때?")["type"] == "answer"
 
 def test_pipeline_scope_passes_date_range_and_keywords(monkeypatch):
-    import clarify
+    from app import clarify
     seen = {}
     monkeypatch.setattr(pipeline, "analyze_question_intent", lambda q: {**INTENT_T1, "needs_scope": False, "scope_axis": None})
     monkeypatch.setattr(pipeline, "scope_date_range", lambda scope: ("2024-01-01", "2024-12-31") if scope == {"axis": "season", "value": "2024"} else None)
@@ -333,19 +333,19 @@ def test_pipeline_opponent_scope_adds_keyword(monkeypatch):
 # ---------- 범위 → 날짜·키워드 ----------
 
 def test_scope_date_range_season():
-    from clarify import scope_date_range
+    from app.clarify import scope_date_range
     assert scope_date_range({"axis": "season", "value": "2024"}) == ("2024-01-01", "2024-12-31")
     assert scope_date_range({"axis": "season", "value": "abc"}) is None
     assert scope_date_range(None) is None
     assert scope_date_range({"axis": "opponent", "value": "젠지"}) is None
 
 def test_scope_date_range_tournament_from_db(monkeypatch):
-    import clarify
+    from app import clarify
     monkeypatch.setattr(clarify, "_query", lambda sql, params=(): [{"s": "2025-01-15", "e": "2025-02-28"}])
     assert clarify.scope_date_range({"axis": "tournament", "value": "2025 LCK Cup"}) == ("2025-01-15", "2025-02-28")
 
 def test_scope_date_range_tournament_falls_back_to_year(monkeypatch):
-    import clarify
+    from app import clarify
     monkeypatch.setattr(clarify, "_query", lambda sql, params=(): [{"s": None, "e": None}])
     assert clarify.scope_date_range({"axis": "tournament", "value": "2025 LCK Cup"}) == ("2025-01-01", "2025-12-31")
     def boom(sql, params=()):
@@ -355,14 +355,14 @@ def test_scope_date_range_tournament_falls_back_to_year(monkeypatch):
     assert clarify.scope_date_range({"axis": "tournament", "value": "LCK Cup"}) is None
 
 def test_scope_date_range_patch(monkeypatch):
-    import clarify
+    from app import clarify
     monkeypatch.setattr(clarify, "_query", lambda sql, params=(): [{"season_year": 2025}])
     assert clarify.scope_date_range({"axis": "patch", "value": "25.24"}) == ("2025-01-01", "2025-12-31")
     monkeypatch.setattr(clarify, "_query", lambda sql, params=(): [])
     assert clarify.scope_date_range({"axis": "patch", "value": "99.99"}) is None
 
 def test_scope_keywords():
-    from clarify import scope_keywords
+    from app.clarify import scope_keywords
     assert scope_keywords({"axis": "opponent", "value": "젠지 이스포츠"}) == ["젠지 이스포츠"]
     assert scope_keywords({"axis": "champion", "value": "아지르"}) == ["아지르"]
     assert scope_keywords({"axis": "season", "value": "2024"}) == []
@@ -393,7 +393,7 @@ def _graph():
     return {"nodes": nodes, "links": links}, facts
 
 def test_filter_graph_by_date_keeps_only_matches_in_range():
-    from neo4j_query import filter_graph_by_date
+    from app.search.neo4j_query import filter_graph_by_date
     graph, facts = _graph()
     g, f = filter_graph_by_date(graph, facts, "2024-01-01", "2024-12-31")
     ids = {n["id"] for n in g["nodes"]}
@@ -403,19 +403,19 @@ def test_filter_graph_by_date_keeps_only_matches_in_range():
     assert [x["target"] for x in f] == ["KT vs T1 · 2024-01-26"]
 
 def test_filter_graph_by_date_keeps_seed_even_if_isolated():
-    from neo4j_query import filter_graph_by_date
+    from app.search.neo4j_query import filter_graph_by_date
     graph, facts = _graph()
     g, _ = filter_graph_by_date(graph, facts, "2030-01-01", "2030-12-31")
     assert {n["id"] for n in g["nodes"]} == {"t1", "mnd"} and g["links"][0]["target"] == "mnd"
 
 def test_filter_graph_by_date_noop_when_all_inside():
-    from neo4j_query import filter_graph_by_date
+    from app.search.neo4j_query import filter_graph_by_date
     graph, facts = _graph()
     g, f = filter_graph_by_date(graph, facts, "2020-01-01", "2030-12-31")
     assert g is graph and f is facts
 
 def test_filter_articles_by_date():
-    from rag_answer import filter_by_date
+    from app.search.rag_answer import filter_by_date
     items = [{"published_at": "2025-03-01T00:00:00"}, {"published_at": "2024-06-01"}, {"published_at": ""}, {"published_at": "2024-12-31"}]
     assert filter_by_date(items, "2024-01-01", "2024-12-31", 5) == [{"published_at": "2024-06-01"}, {"published_at": "2024-12-31"}]
     assert filter_by_date(items, "2024-01-01", "2024-12-31", 1) == [{"published_at": "2024-06-01"}]

@@ -142,7 +142,7 @@ def decide_clarification(question: str, intent_result: dict, options_fn) -> dict
 
 def _query(sql, params=()):
     """한 번 연결해 rows(dict) 를 돌려준다. 실패는 호출자가 처리한다. pymysql 은 지연 import."""
-    from mysql_connect import get_connection
+    from app.db.mysql_connect import get_connection
     conn = get_connection()
     try:
         with conn.cursor() as cur:
