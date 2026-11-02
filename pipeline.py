@@ -10,6 +10,7 @@
              └→ [LLM #5] 세 답변 통합 → 최종 답변 + 그래프
 """
 
+from clarify import decide_clarification, scope_options
 from clova_extract import (
     analyze_question_intent,
     call_hyperclova_kg_answer,
@@ -49,12 +50,25 @@ def _search_articles_safe(question, top_k=3):
         return []
 
 
-def run_pipeline(question, top_k=3, graph_limit=100):
+def run_pipeline(question, top_k=3, graph_limit=100, skip_clarify=False):
     # 1) 의도 분석 (LLM #1)
     intent_result = analyze_question_intent(question)
     keywords = intent_result.get("keywords") or question
     print("DEBUG intent:", intent_result.get("intent"))
     print("DEBUG keywords:", keywords)
+
+    # 1-1) 범위 되묻기. 시즌·대회가 빠진 질문이면 검색과 나머지 LLM 호출 없이 바로 되묻는다.
+    #      skip_clarify 는 프론트가 선택지를 고른 뒤 보내는 두 번째 질문에 붙이는 하드 가드다.
+    if not skip_clarify:
+        clarification = decide_clarification(question, intent_result, scope_options)
+        if clarification:
+            print("DEBUG clarify:", clarification["axis"])
+            return {
+                "type": "clarify",
+                "question": question,
+                "intent": intent_result.get("intent", ""),
+                "clarify": clarification,
+            }
 
     # 2) 기사 검색(ChromaDB) → 기사 기반 답변 (LLM #2)
     docs = _search_articles_safe(question, top_k=top_k)
@@ -82,6 +96,7 @@ def run_pipeline(question, top_k=3, graph_limit=100):
     )
 
     return {
+        "type": "answer",
         "question": question,
         "intent": intent_result.get("intent", ""),
         "keywords": keywords,

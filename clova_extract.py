@@ -332,10 +332,18 @@ def _analyze_question_intent_uncached(question):
 별칭은 통일해줘.
 예: 페이커/이상혁 → Faker, 티원 → T1, 젠지 → Gen.G
 
+범위 판단:
+- 전략, 성적, 승률, 폼, 활약, 밴픽처럼 시즌이나 대회에 따라 답이 달라지는 질문인데
+  질문에 연도·시즌·대회가 없으면 needs_scope 를 true 로 하고 scope_axis 를 정해줘.
+  (대회 단위로 묻는 게 자연스러우면 "tournament", 연도 단위면 "season")
+- 소속 선수, 설립 연도, 선수의 포지션처럼 범위와 무관한 질문이면 needs_scope 는 false, scope_axis 는 null.
+
 반드시 아래 JSON 형식으로만 답해줘.
 {{
   "intent": "질문 의도를 한 문장으로",
-  "keywords": ["검색", "키워드", "목록"]
+  "keywords": ["검색", "키워드", "목록"],
+  "needs_scope": false,
+  "scope_axis": null
 }}
 
 질문:
@@ -345,17 +353,20 @@ def _analyze_question_intent_uncached(question):
     content, error = _call_clova_chat(system, user, temperature=0.0, max_tokens=512)
 
     if error or not content:
-        return {"intent": "", "keywords": [], "error": error}
+        return {"intent": "", "keywords": [], "needs_scope": False, "scope_axis": None, "error": error}
 
     try:
         result = parse_json_only(content)
         if not isinstance(result.get("keywords"), list):
             result["keywords"] = []
         result.setdefault("intent", "")
+        # 범위 키 정규화. bool 이 아니면 false, 모르는 축은 null.
+        result["needs_scope"] = result.get("needs_scope") is True
+        result["scope_axis"] = result.get("scope_axis") if result.get("scope_axis") in ("tournament", "season") else None
         return result
     except Exception as e:  # noqa: BLE001
         print("의도 분석 JSON 파싱 실패:", e)
-        return {"intent": "", "keywords": [], "error": str(e), "raw_content": content}
+        return {"intent": "", "keywords": [], "needs_scope": False, "scope_axis": None, "error": str(e), "raw_content": content}
 
 
 # 의도 분석 결과 캐시. LLM 키워드 추출이 호출마다 달라지면 같은 질문에도 그래프가 바뀌어
