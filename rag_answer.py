@@ -2,6 +2,7 @@ print("🚨 rag_answer.py 실행됨")
 
 from chroma_client import COLLECTION, get_client, get_model
 from clova_extract import call_hyperclova_summary
+from text_utils import clean_text
 
 
 def _get_collection():
@@ -44,8 +45,8 @@ def search_articles(question, top_k=3, date_range=None):
     for text, meta in zip(results["documents"][0], results["metadatas"][0]):
         meta = meta or {}
         items.append({
-            "text": text,
-            "title": meta.get("title", ""),
+            "text": clean_text(text),
+            "title": clean_text(meta.get("title", "")),
             "published_at": meta.get("published_at", ""),
             "url": meta.get("url", ""),
             "article_id": meta.get("article_id"),

@@ -2,6 +2,7 @@ import os
 import re
 
 from connect import get_driver
+from text_utils import clean_text
 from graph_schema_config import VISUAL_EXCLUDED_LABELS, VISUAL_EXCLUDED_RELATIONS
 
 print("### LOADED neo4j_query.py ###", os.path.abspath(__file__))
@@ -12,6 +13,10 @@ print("### LOADED neo4j_query.py ###", os.path.abspath(__file__))
 # =========================
 
 def _node_name(node):
+    return clean_text(_raw_node_name(node))
+
+
+def _raw_node_name(node):
     return (
         node.get("display_name")
         or node.get("name")
@@ -253,7 +258,7 @@ def _add_node(nodes, node, seed_ids):
 def _claim_evidence(record):
     return {
         "article_key": record["article_key"],
-        "text": record["evidence_text"],
+        "text": clean_text(record["evidence_text"]),
         "confidence": record["confidence"],
     }
 

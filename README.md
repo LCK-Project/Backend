@@ -115,7 +115,7 @@ cp .env.example .env
 | 변수 | 설명 |
 |------|------|
 | `CLOVA_API_KEY`, `CLOVA_APP_TYPE`, `CLOVA_MODEL` | HyperCLOVA X 인증 정보. 기본 모델은 `HCX-007` |
-| `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`, `NEO4J_DATABASE` | Neo4j 연결 정보 |
+| `NEO4J_URI`, `NEO4J_USER`(또는 Aura 형식 `NEO4J_USERNAME`), `NEO4J_PASSWORD`, `NEO4J_DATABASE` | Neo4j 연결 정보 |
 | `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE` | MySQL(espo) 연결 정보 |
 | `NEWS_API_ACCESS_KEY` | 빅카인즈 API 키 (기사 수집 시에만) |
 | `CORS_ORIGINS` | 허용할 프론트엔드 origin. 쉼표로 여러 개 지정, 기본값 `*` |
