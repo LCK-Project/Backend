@@ -1,4 +1,4 @@
-import neo4j_query as q
+from app.search import neo4j_query as q
 from tests.stubs import StubNode, StubRel
 
 HLE = StubNode("4:x:1", ["Entity", "Team"], {"canonical_name": "한화생명 이스포츠"})

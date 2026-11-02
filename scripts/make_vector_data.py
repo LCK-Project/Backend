@@ -1,8 +1,10 @@
 import json
-from chunk import split_text_overlap
+
+from app.common.chunk import split_text_overlap
+from scripts.paths import ARTICLES_JSON, VECTOR_DATA_JSON
 
 with open(
-    "kmib_lck_yunminsop.json",
+    ARTICLES_JSON,
     "r",
     encoding="utf-8"
 ) as f:
@@ -30,7 +32,7 @@ for article_idx, article in enumerate(articles):
         })
 
 with open(
-    "vector_data.json",
+    VECTOR_DATA_JSON,
     "w",
     encoding="utf-8"
 ) as f:

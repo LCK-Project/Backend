@@ -14,7 +14,7 @@ RDB(espo) 기반 정형 데이터 검색 - 하이브리드 방식.
 
 import re
 
-from mysql_connect import get_connection
+from app.db.mysql_connect import get_connection
 
 # =========================
 # 키워드 정리
@@ -429,7 +429,7 @@ def _format_rows(rows):
 
 def _text_to_sql_facts(cur, question, entity_hint):
     # 순환 import 방지를 위해 함수 안에서 import
-    from clova_extract import generate_sql_with_clova
+    from app.llm.clova_extract import generate_sql_with_clova
 
     sql = generate_sql_with_clova(question, RDB_SCHEMA_PROMPT, entity_hint)
     safe_sql = _sanitize_sql(sql)

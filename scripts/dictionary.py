@@ -1,6 +1,8 @@
 import pandas as pd
 
-df = pd.read_csv("alias_dictionary.csv")
+from scripts.paths import ALIAS_DICTIONARY_CSV
+
+df = pd.read_csv(ALIAS_DICTIONARY_CSV)
 
 ALIAS_DICT = {}
 

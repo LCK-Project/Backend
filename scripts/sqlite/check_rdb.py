@@ -1,6 +1,8 @@
 import sqlite3
 
-conn = sqlite3.connect("lck_kg.db")
+from scripts.paths import SQLITE_DB
+
+conn = sqlite3.connect(SQLITE_DB)
 cur = conn.cursor()
 
 cur.execute("SELECT COUNT(*) FROM article")

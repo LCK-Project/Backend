@@ -1,4 +1,4 @@
-from chroma_client import COLLECTION, get_client, get_model
+from app.db.chroma_client import COLLECTION, get_client, get_model
 
 model = get_model()
 

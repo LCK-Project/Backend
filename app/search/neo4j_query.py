@@ -1,9 +1,9 @@
 import os
 import re
 
-from connect import get_driver
-from text_utils import clean_text
-from graph_schema_config import VISUAL_EXCLUDED_LABELS, VISUAL_EXCLUDED_RELATIONS
+from app.db.connect import get_driver
+from app.common.text_utils import clean_text
+from app.common.graph_schema_config import VISUAL_EXCLUDED_LABELS, VISUAL_EXCLUDED_RELATIONS
 
 print("### LOADED neo4j_query.py ###", os.path.abspath(__file__))
 

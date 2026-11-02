@@ -1,5 +1,5 @@
-from clova_extract import call_hyperclova_kg_answer
-from neo4j_query import search_graph_knowledge
+from app.llm.clova_extract import call_hyperclova_kg_answer
+from app.search.neo4j_query import search_graph_knowledge
 
 
 def answer_question_from_kg(question, graph_keywords=None, limit=100):

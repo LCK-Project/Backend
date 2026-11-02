@@ -1,4 +1,4 @@
-import clova_extract as ce
+from app.llm import clova_extract as ce
 
 
 def _fake_calls(answers):

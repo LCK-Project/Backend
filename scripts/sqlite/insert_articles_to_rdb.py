@@ -1,9 +1,11 @@
 import json
 import sqlite3
-from chunk import split_text_overlap
 
-JSON_PATH = "kmib_lck_yunminsop.json"
-DB_PATH = "lck_kg.db"
+from app.common.chunk import split_text_overlap
+from scripts.paths import ARTICLES_JSON, SQLITE_DB
+
+JSON_PATH = ARTICLES_JSON
+DB_PATH = SQLITE_DB
 
 conn = sqlite3.connect(DB_PATH)
 cur = conn.cursor()

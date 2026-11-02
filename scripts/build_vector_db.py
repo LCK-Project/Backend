@@ -15,7 +15,7 @@ import datetime
 import os
 import sys
 import time
-from chunk import split_text_overlap
+from app.common.chunk import split_text_overlap
 
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
@@ -107,7 +107,7 @@ def build(collection, model, chunks: list[dict], batch_size: int = 32, log=print
 
 
 def _count_articles():
-    from mysql_connect import get_connection
+    from app.db.mysql_connect import get_connection
 
     try:
         conn = get_connection()
@@ -149,8 +149,7 @@ def main(argv) -> int:
         log("경고: 기사 0건, ChromaDB 빌드 건너뜀")
         return 0
 
-    import chroma_client as cc
-
+    from app.db import chroma_client as cc
     if if_missing and not should_build(cc.read_marker(), count):
         log(f"완료 마커 일치({count}건), 건너뜀")
         return 0
@@ -161,7 +160,7 @@ def main(argv) -> int:
     if os.path.exists(cc.marker_path()):
         os.remove(cc.marker_path())
 
-    from mysql_connect import get_connection
+    from app.db.mysql_connect import get_connection
 
     conn = get_connection()
     try:

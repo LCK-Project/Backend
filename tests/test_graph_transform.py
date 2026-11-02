@@ -1,4 +1,4 @@
-from neo4j_query import build_match_name, node_to_dict
+from app.search.neo4j_query import build_match_name, node_to_dict
 from tests.stubs import StubNode
 
 
@@ -26,7 +26,7 @@ def test_staff_label_and_name():
     assert d["label"] == "Staff" and d["name"] == "김정수"
 
 
-from neo4j_query import format_graph_facts, records_to_facts, records_to_graph
+from app.search.neo4j_query import format_graph_facts, records_to_facts, records_to_graph
 from tests.stubs import StubRel, claim_record, structure_record
 
 HLE = StubNode("4:x:1", ["Entity", "Team"], {"canonical_name": "한화생명 이스포츠"})
