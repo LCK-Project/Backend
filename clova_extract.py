@@ -332,28 +332,34 @@ def _analyze_question_intent_uncached(question):
 별칭은 통일해줘.
 예: 페이커/이상혁 → Faker, 티원 → T1, 젠지 → Gen.G
 
-범위 판단:
-- 전략, 성적, 승률, 폼, 활약, 밴픽처럼 시즌이나 대회에 따라 답이 달라지는 질문인데
-  질문에 연도·시즌·대회가 없으면 needs_scope 를 true 로 하고 scope_axis 를 정해줘.
-  (대회 단위로 묻는 게 자연스러우면 "tournament", 연도 단위면 "season")
-- 소속 선수, 설립 연도, 선수의 포지션처럼 범위와 무관한 질문이면 needs_scope 는 false, scope_axis 는 null.
+범위 판단 (needs_scope, scope_axis):
+- 전략, 성적, 승률, 폼, 활약, 밴픽, 우승처럼 시즌이나 대회에 따라 답이 달라지는 질문인데
+  질문에 연도·시즌·대회가 적혀 있지 않으면 needs_scope 는 true 다. 이때 scope_axis 는
+  대회 단위로 되묻는 게 자연스러우면 "tournament", 연도 단위면 "season" 이다.
+- 질문에 연도·시즌·대회가 이미 있으면 needs_scope 는 false 다.
+- 소속 선수, 설립 연도, 선수의 포지션처럼 시기와 무관한 질문이면 needs_scope 는 false, scope_axis 는 null 이다.
+예시:
+- "T1의 전략이 궁금해" → needs_scope true, scope_axis "tournament"
+- "2025 LCK Cup 에서 T1 전략" → needs_scope false
+- "T1 소속 선수 알려줘" → needs_scope false, scope_axis null
 
-반드시 아래 JSON 형식으로만 답해줘.
+반드시 아래 JSON 형식으로만 답해줘. 값은 질문에 맞게 채워.
 {{
   "intent": "질문 의도를 한 문장으로",
   "keywords": ["검색", "키워드", "목록"],
-  "needs_scope": false,
-  "scope_axis": null
+  "needs_scope": true 또는 false,
+  "scope_axis": "tournament" 또는 "season" 또는 null
 }}
 
 질문:
 {question}
 """
 
-    content, error = _call_clova_chat(system, user, temperature=0.0, max_tokens=512)
+    # HCX-007 은 본문 앞에 사고 토큰을 수백 개 쓰므로 512 로는 본문이 잘려 빈 문자열이 온다.
+    content, error = _call_clova_chat(system, user, temperature=0.0, max_tokens=2048)
 
     if error or not content:
-        return {"intent": "", "keywords": [], "needs_scope": False, "scope_axis": None, "error": error}
+        return {"intent": "", "keywords": [], "needs_scope": False, "scope_axis": None, "error": error or "empty content"}
 
     try:
         result = parse_json_only(content)
