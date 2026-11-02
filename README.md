@@ -43,6 +43,38 @@ docker compose up --build
            └→ [LLM #5] 세 답변 통합 → 최종 답변
 ```
 
+### 범위 되묻기 (한 번)
+
+"T1의 전략이 궁금해"처럼 시즌·대회에 따라 답이 달라지는데 범위가 없는 질문은 바로 답하지 않고 한 번 되묻습니다.
+의도 분석(LLM #1)이 `needs_scope`·`scope_axis` 를 함께 내고, 질문에 연도·시즌·대회 토큰이 없으면 나머지 검색과 LLM 호출을 건너뛰고
+아래 응답을 돌려줍니다. 선택지는 MySQL `tournament`·`season` 테이블에 실제 있는 이름만 최신순으로 넣습니다.
+
+```json
+{ "type": "clarify", "question": "T1의 전략이 궁금해", "intent": "...",
+  "clarify": { "axis": "tournament", "prompt": "어느 대회 기준으로 알아볼까요?", "options": ["2026 LCK Rounds 3-4", "..."] } }
+```
+
+프론트는 고른 선택지를 응답의 `template` 대로 질문에 붙여(`T1의 전략이 궁금해 (2025 LCK Cup 기준)`)
+`{"question": "...", "skip_clarify": true, "scope": {"axis": "tournament", "value": "2025 LCK Cup"}}` 로 다시 보냅니다.
+`skip_clarify` 가 true 면 항상 답하므로 되묻기는 질문당 한 번입니다. 일반 답변 응답에는 `"type": "answer"` 가 붙습니다.
+
+되묻는 축(`axis`)과 선택지 출처:
+
+| axis | 언제 | 선택지 |
+|---|---|---|
+| `tournament` | 전략·성적·밴픽인데 대회가 없다 | `tournament` 테이블 |
+| `season` | 로스터·소속인데 연도가 없다 | `season` 테이블 |
+| `opponent` | 전적·맞대결인데 상대 팀이 없다 | `team` (주체 팀 제외) |
+| `stage` | 대회는 있는데 정규/플레이오프가 없다 | `tournamentstage` |
+| `champion` | 선수 챔피언 통계인데 챔피언이 없다 | 그 선수가 쓴 챔피언 상위 10 (`gameparticipant`) |
+| `patch` | 메타·밸런스인데 패치가 없다 | `patch` 최신 8개 |
+| `topic` | 팀·선수 이름만 있다 | 고정 목록(팀: 성적·로스터·전략·최근 소식, 선수: 챔피언·성적·소속 이력·최근 기사) |
+
+"요즘·최근·현재·지금·올해·이번" 이 있으면 되묻지 않고 질문에 최신 시즌을 붙여 답합니다.
+`scope` 는 검색에도 적용됩니다. 시즌·대회·패치는 경기(Neo4j Match 노드)와 기사의 날짜 범위로, 상대 팀·챔피언은 그래프 검색 키워드로 씁니다.
+기사 데이터는 현재 2025년 것만 있어서 다른 해를 고르면 기사 근거가 비는 게 정상입니다.
+판정 규칙은 `clarify.py`, 설계는 `docs/specs/2026-11-03-clarify-design.md` 에 있습니다.
+
 ## 디렉터리 구성
 
 | 파일 | 역할 |

@@ -332,30 +332,74 @@ def _analyze_question_intent_uncached(question):
 별칭은 통일해줘.
 예: 페이커/이상혁 → Faker, 티원 → T1, 젠지 → Gen.G
 
-반드시 아래 JSON 형식으로만 답해줘.
+주체 (subject, subject_type):
+- subject 는 질문의 중심이 되는 팀 또는 선수 이름 하나(별칭 통일 후). 없으면 null.
+- subject_type 은 "team", "player", null 중 하나.
+
+범위 판단 (needs_scope, scope_axis):
+- 답하려면 꼭 필요한 범위가 질문에 없을 때만 needs_scope 를 true 로 하고 scope_axis 를 하나만 고른다.
+  둘 이상 비어 있으면 더 중요한 하나만 고른다 (상대 팀 > 대회 > 나머지).
+  "tournament": 전략·성적·밴픽·우승처럼 대회에 따라 답이 달라지는데 연도·시즌·대회가 없다
+  "season": 로스터·소속처럼 연도 단위가 자연스러운데 연도가 없다
+  "opponent": 전적·상대전적·맞대결인데 상대 팀이 없다
+  "stage": 대회나 시즌은 있는데 정규 시즌인지 플레이오프인지 없다
+  "champion": 선수의 챔피언 통계·숙련도인데 챔피언 이름이 없다
+  "patch": 메타·밸런스·OP 챔피언 이야기인데 패치나 시기가 없다
+  "topic": 팀·선수 이름만 있고 무엇을 알고 싶은지 없다
+- "요즘·최근·현재·지금·올해·이번" 이 있으면 시기 범위가 있는 것으로 본다. tournament·season·patch 로 되묻지 않는다.
+- 질문에 연도·시즌·대회가 이미 있으면 tournament·season 으로 되묻지 않는다.
+- 소속 선수, 설립 연도, 포지션처럼 범위와 무관한 질문이면 needs_scope 는 false, scope_axis 는 null 이다.
+예시:
+- "T1의 전략이 궁금해" → needs_scope true, scope_axis "tournament", subject "T1", subject_type "team"
+- "T1 전적 알려줘" → true, "opponent", "T1", "team"
+- "2025 LCK Cup T1 성적 어때" → true, "stage", "T1", "team"
+- "페이커 챔피언 통계" → true, "champion", "Faker", "player"
+- "메타 어때" → true, "patch", null, null
+- "T1 어때?" → true, "topic", "T1", "team"
+- "페이커" → true, "topic", "Faker", "player"
+- "요즘 메타 어때?" → false, null, null, null
+- "2025 LCK Cup 에서 T1 전략" → false, null, "T1", "team"
+- "T1 소속 선수 알려줘" → false, null, "T1", "team"
+
+반드시 아래 JSON 형식으로만 답해줘. 값은 질문에 맞게 채워.
 {{
   "intent": "질문 의도를 한 문장으로",
-  "keywords": ["검색", "키워드", "목록"]
+  "keywords": ["검색", "키워드", "목록"],
+  "needs_scope": true 또는 false,
+  "scope_axis": "tournament" "season" "opponent" "stage" "champion" "patch" "topic" 중 하나 또는 null,
+  "subject": "팀 또는 선수 이름" 또는 null,
+  "subject_type": "team" 또는 "player" 또는 null
 }}
 
 질문:
 {question}
 """
 
-    content, error = _call_clova_chat(system, user, temperature=0.0, max_tokens=512)
+    # HCX-007 은 본문 앞에 사고 토큰을 수백 개 쓰므로 512 로는 본문이 잘려 빈 문자열이 온다.
+    content, error = _call_clova_chat(system, user, temperature=0.0, max_tokens=2048)
 
     if error or not content:
-        return {"intent": "", "keywords": [], "error": error}
+        return {**_EMPTY_INTENT, "error": error or "empty content"}
 
     try:
         result = parse_json_only(content)
         if not isinstance(result.get("keywords"), list):
             result["keywords"] = []
         result.setdefault("intent", "")
+        # 범위·주체 키 정규화. bool 이 아니면 false, 모르는 축·타입은 null, 주체는 비어 있지 않은 문자열만.
+        result["needs_scope"] = result.get("needs_scope") is True
+        result["scope_axis"] = result.get("scope_axis") if result.get("scope_axis") in INTENT_AXES else None
+        subject = result.get("subject")
+        result["subject"] = subject.strip() if isinstance(subject, str) and subject.strip() else None
+        result["subject_type"] = result.get("subject_type") if result.get("subject_type") in ("team", "player") else None
         return result
     except Exception as e:  # noqa: BLE001
         print("의도 분석 JSON 파싱 실패:", e)
-        return {"intent": "", "keywords": [], "error": str(e), "raw_content": content}
+        return {**_EMPTY_INTENT, "error": str(e), "raw_content": content}
+
+
+INTENT_AXES = ("tournament", "season", "opponent", "stage", "champion", "patch", "topic")
+_EMPTY_INTENT = {"intent": "", "keywords": [], "needs_scope": False, "scope_axis": None, "subject": None, "subject_type": None}
 
 
 # 의도 분석 결과 캐시. LLM 키워드 추출이 호출마다 달라지면 같은 질문에도 그래프가 바뀌어

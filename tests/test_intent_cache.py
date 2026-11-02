@@ -14,7 +14,7 @@ def test_same_question_calls_llm_once(monkeypatch):
     ce.analyze_question_intent.cache_clear()
     first = ce.analyze_question_intent("한화생명 우승 전략을 알려줘")
     second = ce.analyze_question_intent("  한화생명 우승 전략을 알려줘 ")
-    assert first == second == {"intent": "a", "keywords": ["한화생명"]} and len(calls) == 1
+    assert first == second == {"intent": "a", "keywords": ["한화생명"], "needs_scope": False, "scope_axis": None, "subject": None, "subject_type": None} and len(calls) == 1
 
 def test_intent_uses_zero_temperature(monkeypatch):
     fake, calls = _fake_calls(['{"intent": "a", "keywords": []}'])
