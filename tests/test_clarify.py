@@ -132,9 +132,35 @@ def test_topic_options_are_fixed_and_do_not_touch_db(monkeypatch):
 
 def test_opponent_options_exclude_subject(monkeypatch):
     import clarify
-    monkeypatch.setattr(clarify, "_query", lambda sql, params=(): [{"name": "T1"}, {"name": "젠지 이스포츠"}, {"name": "KT 롤스터"}])
+    def fake(sql, params=()):
+        if "entityalias" in sql:
+            return []  # 별칭 조회는 못 찾음 → 이름 포함 관계로만 뺀다
+        return [{"name": "T1"}, {"name": "젠지 이스포츠"}, {"name": "KT 롤스터"}]
+    monkeypatch.setattr(clarify, "_query", fake)
     assert scope_options("opponent", "T1", "team") == ["젠지 이스포츠", "KT 롤스터"]
     assert scope_options("opponent", None, None) == ["T1", "젠지 이스포츠", "KT 롤스터"]
+
+def test_opponent_options_exclude_subject_via_alias(monkeypatch):
+    # "T1" 으로 물었는데 DB 팀 이름은 "티원" 인 경우: 별칭 테이블로 같은 팀을 찾아 뺀다
+    import clarify
+    seen = []
+    def fake(sql, params=()):
+        if "entityalias" in sql:
+            seen.append(params)
+            return [{"name": "티원"}]
+        return [{"name": "KT 롤스터"}, {"name": "티원"}, {"name": "젠지 이스포츠"}]
+    monkeypatch.setattr(clarify, "_query", fake)
+    assert scope_options("opponent", "T1", "team") == ["KT 롤스터", "젠지 이스포츠"]
+    assert seen == [("%T1%", "%T1%", "%t1%")]
+
+def test_opponent_options_alias_lookup_failure_still_returns_teams(monkeypatch):
+    import clarify
+    def fake(sql, params=()):
+        if "entityalias" in sql:
+            raise RuntimeError("alias table down")
+        return [{"name": "KT 롤스터"}, {"name": "티원"}]
+    monkeypatch.setattr(clarify, "_query", fake)
+    assert scope_options("opponent", "T1", "team") == ["KT 롤스터", "티원"]
 
 def test_stage_options_are_korean_labels(monkeypatch):
     import clarify

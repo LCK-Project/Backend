@@ -172,6 +172,25 @@ def _player_ids(subject):
     return [row["player_id"] for row in rows]
 
 
+def _subject_team_names(subject):
+    """subject 와 이름·별칭이 닿는 팀의 team_name 집합. 조회 실패는 빈 집합."""
+    like = f"%{subject}%"
+    try:
+        rows = _query(
+            """
+            SELECT DISTINCT t.team_name AS name
+            FROM team t
+            LEFT JOIN entityalias ea ON ea.entity_id = t.entity_id
+            WHERE t.team_name LIKE %s OR ea.alias_name LIKE %s OR ea.normalized_alias LIKE %s
+            """,
+            (like, like, like.lower()),
+        )
+        return set(_names(rows))
+    except Exception as e:  # noqa: BLE001
+        print("DEBUG subject team lookup failed:", e)
+        return set()
+
+
 def scope_options(axis: str, subject: str | None = None, subject_type: str | None = None) -> list[str]:
     """
     축별 선택지. DB 에 실제 있는 이름만 돌려준다. 연결·조회 실패는 빈 리스트다.
@@ -191,8 +210,10 @@ def scope_options(axis: str, subject: str | None = None, subject_type: str | Non
             rows = _query("SELECT team_name AS name FROM team WHERE is_active = 1 ORDER BY team_name")
             names = _names(rows)
             if subject:
-                # 질문의 주체 팀은 상대 선택지에서 뺀다 (이름 포함 관계로 느슨하게)
-                names = [n for n in names if subject not in n and n not in subject]
+                # 질문의 주체 팀은 상대 선택지에서 뺀다. "T1" ↔ "티원" 처럼 표기가 달라도
+                # 별칭 테이블로 같은 팀을 찾고, 그래도 못 찾으면 이름 포함 관계로 느슨하게 뺀다.
+                excluded = _subject_team_names(subject)
+                names = [n for n in names if n not in excluded and subject not in n and n not in subject]
             return names
 
         if axis == "stage":
