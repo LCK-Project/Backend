@@ -25,6 +25,8 @@ class QuestionRequest(BaseModel):
     question: str
     # 선택지를 고른 뒤 보내는 두 번째 질문은 되묻기를 건너뛴다 (docs/specs/2026-11-03-clarify-design.md 3-1)
     skip_clarify: bool = False
+    # 고른 범위 {"axis": "season", "value": "2024"}. 시즌·대회·패치는 날짜 필터, 상대·챔피언은 검색 키워드로 쓴다.
+    scope: dict | None = None
 
 
 @app.get("/")
@@ -34,7 +36,7 @@ def home():
 
 @app.post("/ask")
 def ask(req: QuestionRequest):
-    result = run_pipeline(req.question, skip_clarify=req.skip_clarify)
+    result = run_pipeline(req.question, skip_clarify=req.skip_clarify, scope=req.scope)
 
     # 범위 되묻기. 검색·답변 없이 되묻는 문장과 선택지만 돌려준다.
     if result.get("type") == "clarify":

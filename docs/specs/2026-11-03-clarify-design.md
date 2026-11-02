@@ -152,6 +152,28 @@ ORDER BY tournament_id DESC`. season: `SELECT season_name FROM season ORDER BY s
 4. 칩을 누르지 않고 입력창에 새 질문을 보내도 된다(기존 ask 그대로).
 5. `/ask` 요청 본문에 `skip_clarify` 를 보낸다.
 
+## 4-1. 확장 (2026-11-03 같은 날, 사용자 요청)
+
+구현 뒤 사용자가 두 가지를 더 요청했고, 설계는 아래처럼 늘어났다. 3절의 계약은 그대로이고 키가 추가됐다.
+
+**축 확장.** `axis` 가 `tournament | season | opponent | stage | champion | patch | topic` 이 됐다.
+의도 분석 JSON 에 `subject`(중심 팀·선수 이름)와 `subject_type`(`team | player | null`)이 추가되고,
+clarify 응답에 축별 `template`(예: `"{question} ({option} 상대 기준)"`)이 추가됐다. 프론트는 template 대로
+질문을 합친다. 규칙 층(`already_scoped`)은 시기 축(tournament·season·patch)과 stage 만 질문 토큰으로 막고,
+opponent·champion·topic 은 LLM 판단에 맡긴다. 선택지 출처는 README 표와 같다. topic 은 고정 목록이다.
+
+**최근 표현.** "요즘·최근·현재·지금·올해·이번" 이 있으면 시기 축으로 되묻지 않고, 파이프라인이 질문에
+`(최신시즌 시즌 기준)` 을 붙여 검색·답변에 쓴다(`refine_recent_question`, `latest_season`).
+
+**범위를 검색에 적용.** 선택지를 고른 뒤 프론트가 `scope: {axis, value}` 를 함께 보낸다. 파이프라인은
+`scope_date_range` 로 시즌·대회·패치를 날짜 범위로 바꿔 Neo4j Match 노드(`filter_graph_by_date`)와 기사
+(`rag_answer.filter_by_date`, 후보를 top_k×8 로 넉넉히 가져온 뒤 거름)를 거르고, 상대 팀·챔피언은
+`scope_keywords` 로 그래프 검색 키워드에 더한다. 질문 문장만 좁히고 검색은 전체를 보던 문제(2024 를 골라도
+2024~2026 그래프가 나오던 것)를 이것으로 고쳤다. 기사는 현재 2025 년 것만 있어 다른 해는 0건이 정상이다.
+
+**HCX-007 사고 토큰.** 의도 분석의 `maxCompletionTokens` 를 512 에서 2048 로 올렸다. 이 모델은 본문 앞에 사고
+토큰을 수백 개 써서 512 로는 본문이 잘려 빈 의도가 돌아왔다(기존 버그).
+
 ## 5. 실행 모델
 
 리뷰·검토 없이 이 세션이 직접 구현한다(사용자 지시, 2026-11-03). Backend 와 Frontend 각각

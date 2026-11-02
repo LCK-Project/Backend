@@ -371,9 +371,42 @@ def _empty_graph_result(keywords=None):
     }
 
 
-def search_graph_knowledge(keywords, limit=100):
+def filter_graph_by_date(graph: dict, facts: list[dict], start: str, end: str) -> tuple[dict, list[dict]]:
+    """
+    날짜 범위(둘 다 "YYYY-MM-DD", 양 끝 포함) 밖의 Match 노드와 그에 닿는 간선·사실을 뺀다.
+    날짜가 없는 Match 는 남긴다. 간선이 모두 사라진 비시드 노드도 뺀다. degree 는 다시 센다.
+    """
+    removed = {
+        n["id"] for n in graph["nodes"]
+        if n.get("label") == "Match" and n.get("match_date") and not (start <= n["match_date"] <= end)
+    }
+    if not removed:
+        return graph, facts
+    removed_names = {n["name"] for n in graph["nodes"] if n["id"] in removed}
+
+    links = [l for l in graph["links"] if l["source"] not in removed and l["target"] not in removed]
+    degree: dict[str, int] = {}
+    for l in links:
+        degree[l["source"]] = degree.get(l["source"], 0) + 1
+        degree[l["target"]] = degree.get(l["target"], 0) + 1
+
+    nodes = []
+    for n in graph["nodes"]:
+        if n["id"] in removed:
+            continue
+        d = degree.get(n["id"], 0)
+        if d == 0 and not n.get("is_seed"):
+            continue
+        nodes.append({**n, "degree": d})
+
+    kept_facts = [f for f in facts if f["source"] not in removed_names and f["target"] not in removed_names]
+    return {"nodes": nodes, "links": links}, kept_facts
+
+
+def search_graph_knowledge(keywords, limit=100, date_range=None):
     """
     질문 키워드 기반으로 Neo4j subgraph와 LLM 답변용 triple context를 함께 반환한다.
+    date_range 가 ("YYYY-MM-DD", "YYYY-MM-DD") 면 그 밖의 경기 노드를 뺀다.
     """
 
     keywords = _extract_keywords(keywords)
@@ -404,6 +437,10 @@ def search_graph_knowledge(keywords, limit=100):
     seed_ids = {str(record["n"].element_id) for record in structure_records + claim_records}
     graph = records_to_graph(structure_records, claim_records, seed_ids)
     facts = records_to_facts(structure_records, claim_records)
+    if date_range:
+        before = len(graph["nodes"])
+        graph, facts = filter_graph_by_date(graph, facts, date_range[0], date_range[1])
+        print(f"DEBUG graph date filter {date_range}: nodes {before} → {len(graph['nodes'])}")
     context = format_graph_facts(facts)
 
     print("DEBUG graph nodes:", len(graph["nodes"]))

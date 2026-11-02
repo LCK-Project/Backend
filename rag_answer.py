@@ -14,11 +14,18 @@ def _get_collection():
         return None
 
 
-def search_articles(question, top_k=3):
+def filter_by_date(items, start, end, top_k):
+    """published_at 앞 10자리가 [start, end] 안인 항목만 top_k 개. 날짜가 없는 항목은 뺀다."""
+    kept = [it for it in items if (it.get("published_at") or "")[:10] and start <= it["published_at"][:10] <= end]
+    return kept[:top_k]
+
+
+def search_articles(question, top_k=3, date_range=None):
     """
     질문과 가까운 기사 청크를 dict 리스트로 반환한다.
     각 항목: {"text", "title", "published_at", "url", "article_id"}
-    컬렉션이 없으면 빈 리스트.
+    컬렉션이 없으면 빈 리스트. date_range 가 ("YYYY-MM-DD", "YYYY-MM-DD") 면
+    넉넉히 가져온 뒤 그 범위 안의 기사만 top_k 개 남긴다.
     """
     collection = _get_collection()
     if collection is None:
@@ -26,9 +33,10 @@ def search_articles(question, top_k=3):
 
     query_embedding = get_model().encode(question).tolist()
 
+    n_results = top_k * 8 if date_range else top_k
     results = collection.query(
         query_embeddings=[query_embedding],
-        n_results=top_k,
+        n_results=n_results,
         include=["documents", "metadatas"],
     )
 
@@ -42,6 +50,8 @@ def search_articles(question, top_k=3):
             "url": meta.get("url", ""),
             "article_id": meta.get("article_id"),
         })
+    if date_range:
+        items = filter_by_date(items, date_range[0], date_range[1], top_k)
     return items
 
 
