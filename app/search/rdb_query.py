@@ -132,16 +132,8 @@ def _resolve_teams(cur, keywords):
 # 2) 고정 통계 쿼리 (정형 질문)
 # =========================
 
-_YEAR = re.compile(r"(20\d{2})")
-
-
-def question_date_range(question):
-    """질문에 연도가 정확히 하나 있으면 그 해 전체 ("YYYY-01-01", "YYYY-12-31"), 아니면 None."""
-    years = set(_YEAR.findall(str(question or "")))
-    if len(years) != 1:
-        return None
-    y = years.pop()
-    return (f"{y}-01-01", f"{y}-12-31")
+# 질문에 적힌 연도 → 날짜 범위. 그래프·기사 검색과 같은 규칙을 쓰도록 app.clarify 의 것을 그대로 쓴다.
+from app.clarify import question_date_range  # noqa: E402,F401
 
 
 def _date_clause(date_range, alias="m"):

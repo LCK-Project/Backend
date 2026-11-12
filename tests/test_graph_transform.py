@@ -48,10 +48,10 @@ def test_multiple_seeds():
     assert all(n["is_seed"] for n in g["nodes"])
 def test_structure_edge_has_null_evidence():
     g = records_to_graph([structure_record(HLE, StubRel("WON_MATCH", HLE, M9), M9)], [], set())
-    assert g["links"] == [{"source": "4:x:1", "target": "4:x:9", "type": "WON_MATCH", "evidence": None}]
+    assert g["links"] == [{"source": "4:x:1", "target": "4:x:9", "type": "WON_MATCH", "evidence": None, "when": [["2025-09-06", "2025-09-06"]]}]
 def test_claim_record_becomes_edge_with_evidence():
     g = records_to_graph([], [claim_record(HLE, ZEKA, AZIR, "PICKED_CHAMPION", "ARTICLE_1", "제카가 아지르를 꺼냈다.", 1.0)], {"4:x:1"})
-    assert g["links"] == [{"source": "4:x:3", "target": "4:x:13", "type": "PICKED_CHAMPION", "evidence": {"article_key": "ARTICLE_1", "text": "제카가 아지르를 꺼냈다.", "confidence": 1.0}}]
+    assert g["links"] == [{"source": "4:x:3", "target": "4:x:13", "type": "PICKED_CHAMPION", "evidence": {"article_key": "ARTICLE_1", "text": "제카가 아지르를 꺼냈다.", "confidence": 1.0}, "when": None}]
     assert {n["id"] for n in g["nodes"]} == {"4:x:3", "4:x:13"}
 def test_duplicate_claim_keeps_first_evidence():
     claims = [claim_record(HLE, ZEKA, AZIR, "PICKED_CHAMPION", "ARTICLE_1", "첫 문장", 1.0), claim_record(HLE, ZEKA, AZIR, "PICKED_CHAMPION", "ARTICLE_2", "둘째 문장", 0.8)]
@@ -69,3 +69,133 @@ def test_facts_include_evidence_key():
 def test_format_graph_facts_unchanged_format():
     facts = records_to_facts([structure_record(HLE, StubRel("WON_MATCH", HLE, M9), M9)], [])
     assert format_graph_facts(facts) == "1. (Team) 한화생명 이스포츠 -[WON_MATCH]-> (Match) GEN vs HLE · 2025-09-06"
+
+
+# ---------- 간선의 when (날짜 스트립 기간 선택용) ----------
+from app.search.neo4j_query import claim_when, structure_when
+
+def _rec(n, rel, m, spans=None, game_keys=None):
+    return {**structure_record(n, rel, m), "spans": spans or [], "game_keys": game_keys or []}
+
+def _link(g):
+    assert len(g["links"]) == 1
+    return g["links"][0]
+
+def test_when_member_of_collects_every_interval_sorted():
+    rec = _rec(HLE, StubRel("MEMBER_OF", ZEKA, HLE), ZEKA, spans=[["2025-07-23", "2025-09-10"], ["2025-04-01", "2025-07-23"], ["2025-04-01", "2025-07-23"]])
+    assert structure_when(rec) == [["2025-04-01", "2025-07-23"], ["2025-07-23", "2025-09-10"]]
+
+def test_when_open_ended_interval_keeps_none():
+    rec = _rec(HLE, StubRel("MEMBER_OF", ZEKA, HLE), ZEKA, spans=[["2026-04-01", ""], [None, None]])
+    assert structure_when(rec) == [["2026-04-01", None]]
+
+def test_when_pick_uses_game_dates_and_skips_unknown_game():
+    rec = _rec(ZEKA, StubRel("PICKED_CHAMPION", ZEKA, AZIR), AZIR, spans=[[None, None], [None, None]], game_keys=["G2", "G1", "G_없음"])
+    dates = {"G1": "2025-01-15T17:00:00", "G2": "2025-08-30T15:00:00"}
+    assert structure_when(rec, dates) == [["2025-01-15", "2025-01-15"], ["2025-08-30", "2025-08-30"]]
+
+def test_when_match_edge_uses_match_date():
+    assert structure_when(_rec(HLE, StubRel("WON_MATCH", HLE, M9), M9)) == [["2025-09-06", "2025-09-06"]]
+
+def test_when_fan_comment_edge_uses_published_date():
+    video = StubNode("4:x:50", ["FanVideo"], {"video_published_at": "2025-08-02T13:00:10"})
+    comment = StubNode("4:x:51", ["FanComment"], {"comment_published_at": "2026-07-05T04:42:09"})
+    rec = _rec(video, StubRel("HAS_COMMENT", video, comment), comment)
+    assert structure_when(rec) == [["2025-08-02", "2025-08-02"], ["2026-07-05", "2026-07-05"]]
+
+def test_when_none_for_undated_edge():
+    league = StubNode("4:x:60", ["League"], {"name": "LCK"})
+    assert structure_when(_rec(HLE, StubRel("COMPETES_IN", HLE, league), league)) is None
+    # 스텁처럼 spans·game_keys 키가 아예 없는 레코드도 받는다.
+    assert structure_when(structure_record(HLE, StubRel("COMPETES_IN", HLE, league), league)) is None
+
+def test_claim_when_prefers_published_at_then_article_key():
+    base = claim_record(HLE, ZEKA, AZIR, "PICKED_CHAMPION", "ARTICLE_01100201.20250306154350001", "t", 1.0)
+    assert claim_when({**base, "published_at": "2025-03-07T00:00:00"}) == [["2025-03-07", "2025-03-07"]]
+    assert claim_when(base) == [["2025-03-06", "2025-03-06"]]
+    assert claim_when({**base, "article_key": "ARTICLE_1"}) is None
+
+def test_graph_duplicate_claims_merge_when_and_keep_first_evidence():
+    claims = [
+        {**claim_record(HLE, ZEKA, AZIR, "PICKED_CHAMPION", "ARTICLE_2", "둘째 날", 1.0), "published_at": "2025-08-30T00:00:00"},
+        {**claim_record(HLE, ZEKA, AZIR, "PICKED_CHAMPION", "ARTICLE_1", "첫째 날", 0.8), "published_at": "2025-03-06T00:00:00"},
+    ]
+    link = _link(records_to_graph([], claims, set()))
+    assert link["evidence"]["article_key"] == "ARTICLE_2"
+    assert link["when"] == [["2025-03-06", "2025-03-06"], ["2025-08-30", "2025-08-30"]]
+
+def test_graph_structure_edge_ignores_claim_dates_of_same_edge():
+    structure = [_rec(HLE, StubRel("MEMBER_OF", ZEKA, HLE), ZEKA, spans=[["2025-04-01", "2025-07-23"]])]
+    claims = [{**claim_record(HLE, ZEKA, HLE, "MEMBER_OF", "ARTICLE_3", "제카는 한화생명 소속이다.", 1.0), "published_at": "2026-01-01T00:00:00"}]
+    link = _link(records_to_graph(structure, claims, set()))
+    assert link["evidence"] is None
+    assert link["when"] == [["2025-04-01", "2025-07-23"]]
+
+def test_graph_same_structure_edge_from_two_seeds_merges_when():
+    a = _rec(ZEKA, StubRel("PICKED_CHAMPION", ZEKA, AZIR), AZIR, game_keys=["G1"])
+    b = _rec(AZIR, StubRel("PICKED_CHAMPION", ZEKA, AZIR), ZEKA, game_keys=["G2"])
+    link = _link(records_to_graph([a, b], [], set(), {"G1": "2025-01-15", "G2": "2025-08-30"}))
+    assert link["when"] == [["2025-01-15", "2025-01-15"], ["2025-08-30", "2025-08-30"]]
+
+
+# ---------- 그래프 검색 키워드 ----------
+from app.search.neo4j_query import _extract_keywords
+
+def test_keywords_drop_numeric_only_tokens():
+    assert _extract_keywords(["2024", "T1", "전략"]) == ["t1", "전략"]
+    assert _extract_keywords(["2024년", "5월", "페이커"]) == ["페이커"]
+    assert _extract_keywords("2024 T1 전략") == ["2024 t1 전략", "t1", "전략"]
+
+def test_keywords_keep_names_containing_digits():
+    assert _extract_keywords(["T1", "100 Thieves"]) == ["t1", "100 thieves", "thieves"]
+
+
+# ---------- 시드 찾기 ----------
+from app.search import neo4j_query as nq
+
+class _Session:
+    """run 으로 받은 쿼리를 기록하고, 쿼리별로 정해 둔 행을 돌려준다."""
+    def __init__(self, exact, contains):
+        self.rows = {nq.SEED_EXACT_CYPHER: exact, nq.SEED_CONTAINS_CYPHER: contains}
+        self.calls = []
+    def run(self, query, **params):
+        self.calls.append((query, params))
+        return [{"id": i} for i in self.rows[query]]
+
+def test_seed_keys_strip_spaces_and_dedupe():
+    assert nq.seed_keys(["한화생명 이스포츠", "t1", "t 1", " "]) == ["한화생명이스포츠", "t1"]
+
+def test_find_seed_ids_exact_hit_skips_contains():
+    session = _Session(exact=["4:x:1"], contains=["4:x:1", "4:x:99"])
+    assert nq.find_seed_ids(session, ["kt", "전략"]) == ["4:x:1"]
+    assert [q for q, _ in session.calls] == [nq.SEED_EXACT_CYPHER]
+    assert session.calls[0][1]["keys"] == ["kt", "전략"]
+
+def test_find_seed_ids_falls_back_to_contains_only_without_exact_hit():
+    session = _Session(exact=[], contains=["4:x:7"])
+    assert nq.find_seed_ids(session, ["페이"]) == ["4:x:7"]
+    assert [q for q, _ in session.calls] == [nq.SEED_EXACT_CYPHER, nq.SEED_CONTAINS_CYPHER]
+
+def test_find_seed_ids_no_keywords_runs_nothing():
+    session = _Session(exact=["4:x:1"], contains=[])
+    assert nq.find_seed_ids(session, [" "]) == []
+    assert session.calls == []
+
+def test_seed_queries_only_consider_entity_nodes():
+    assert "MATCH (n:Entity)" in nq.SEED_EXACT_CYPHER and "MATCH (n:Entity)" in nq.SEED_CONTAINS_CYPHER
+    assert " IN $keys" in nq.SEED_EXACT_CYPHER and "CONTAINS" not in nq.SEED_EXACT_CYPHER
+
+
+# ---------- 질문 종류별 그래프 구성 ----------
+def test_graph_focus_strategy_words():
+    for q in ("티원 전략 알려줘", "젠지 밴픽 경향", "요즘 메타 어때", "페이커 챔피언 폭", "한화 조합"):
+        assert nq.graph_focus(q) == "strategy", q
+
+def test_graph_focus_default():
+    for q in ("티원 성적 알려줘", "젠지 로스터", "", None):
+        assert nq.graph_focus(q) == "default", q
+
+def test_graph_focus_profiles():
+    assert nq.GRAPH_FOCUS["default"] == {"per_match": nq.STRUCTURE_PER_TYPE_LIMIT, "team_picks": 8}
+    assert nq.GRAPH_FOCUS["strategy"] == {"per_match": 8, "team_picks": 20}
+    assert nq.MATCH_REL_TYPES == ["WON_MATCH", "LOST_MATCH", "PLAYED_MATCH"]

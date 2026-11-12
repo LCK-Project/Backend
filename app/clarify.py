@@ -315,6 +315,22 @@ def scope_date_range(scope: dict | None) -> tuple[str, str] | None:
     return None
 
 
+# 질문에서 연도로 읽을 네 자리 수. 앞뒤에 숫자가 붙은 것("20000 골드" 의 2000)은 연도가 아니다.
+QUESTION_YEAR = re.compile(r"(?<!\d)20\d{2}(?!\d)")
+
+
+def question_date_range(question: str) -> tuple[str, str] | None:
+    """
+    질문에 적힌 연도를 날짜 범위로 바꾼다. "2024 티원 전략" → ("2024-01-01", "2024-12-31").
+    연도가 여러 개면 가장 이른 해의 첫날부터 가장 늦은 해의 마지막 날까지다. 연도가 없으면 None.
+    되묻기를 거치지 않은 질문도 적힌 연도 밖의 경기·기사가 섞이지 않게 하려고 쓴다.
+    """
+    years = sorted(int(y) for y in QUESTION_YEAR.findall(question or ""))
+    if not years:
+        return None
+    return (f"{years[0]}-01-01", f"{years[-1]}-12-31")
+
+
 def scope_keywords(scope: dict | None) -> list[str]:
     """상대 팀·챔피언처럼 그래프 검색 키워드로 쓸 수 있는 범위 값. 그 외 축은 빈 리스트."""
     if not scope or not isinstance(scope, dict):

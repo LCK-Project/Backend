@@ -242,7 +242,7 @@ def _no_search(*args, **kwargs):
 def _stub_full_pipeline(monkeypatch, seen):
     monkeypatch.setattr(pipeline, "scope_options", _options)
     monkeypatch.setattr(pipeline, "_search_articles_safe", lambda q, top_k=3, date_range=None: seen.append(("articles", q)) or [])
-    monkeypatch.setattr(pipeline, "search_graph_knowledge", lambda kw, limit=100, date_range=None: {"facts": [], "context": "", "keywords": kw, "graph": {"nodes": [], "links": []}})
+    monkeypatch.setattr(pipeline, "search_graph_knowledge", lambda kw, limit=100, date_range=None, focus="default": {"facts": [], "context": "", "keywords": kw, "graph": {"nodes": [], "links": []}})
     monkeypatch.setattr(pipeline, "_search_rdb_safe", lambda q, kw, graph_limit=40, date_range=None: seen.append(("rdb", q)) or {"keywords": [], "entities": {"players": [], "teams": []}, "facts": [], "context": "", "sql": None})
     monkeypatch.setattr(pipeline, "call_hyperclova_kg_answer", lambda q, c: seen.append(("kg", q)) or "kg")
     monkeypatch.setattr(pipeline, "call_hyperclova_rdb_answer", lambda q, c: "rdb")
@@ -301,7 +301,7 @@ def test_pipeline_scope_passes_date_range_and_keywords(monkeypatch):
     def articles(q, top_k=3, date_range=None):
         seen["articles"] = date_range
         return []
-    def graph(kw, limit=100, date_range=None):
+    def graph(kw, limit=100, date_range=None, focus="default"):
         seen["graph"] = (kw, date_range)
         return {"facts": [], "context": "", "keywords": kw, "graph": {"nodes": [], "links": []}}
     monkeypatch.setattr(pipeline, "_search_articles_safe", articles)
@@ -318,7 +318,7 @@ def test_pipeline_opponent_scope_adds_keyword(monkeypatch):
     seen = {}
     monkeypatch.setattr(pipeline, "analyze_question_intent", lambda q: {**INTENT_T1, "needs_scope": False, "scope_axis": None})
     monkeypatch.setattr(pipeline, "_search_articles_safe", lambda q, top_k=3, date_range=None: [])
-    def graph(kw, limit=100, date_range=None):
+    def graph(kw, limit=100, date_range=None, focus="default"):
         seen["graph"] = (kw, date_range)
         return {"facts": [], "context": "", "keywords": kw, "graph": {"nodes": [], "links": []}}
     monkeypatch.setattr(pipeline, "search_graph_knowledge", graph)
@@ -427,3 +427,123 @@ def test_pipeline_recent_without_db_keeps_question(monkeypatch):
     monkeypatch.setattr(pipeline, "latest_season", lambda: None)
     _stub_full_pipeline(monkeypatch, seen)
     assert pipeline.run_pipeline("요즘 메타 어때?")["question"] == "요즘 메타 어때?"
+
+
+# ---------- 질문에 적힌 연도 → 날짜 범위 ----------
+from app.clarify import question_date_range
+
+def test_question_date_range_single_year():
+    assert question_date_range("2024 티원의 승리전략을 알려줘") == ("2024-01-01", "2024-12-31")
+
+def test_question_date_range_spans_several_years():
+    assert question_date_range("2026년과 2024년 T1 비교") == ("2024-01-01", "2026-12-31")
+
+def test_question_date_range_none_without_year():
+    assert question_date_range("티원의 승리전략을 알려줘") is None
+    assert question_date_range("") is None
+    assert question_date_range(None) is None
+
+
+def test_filter_graph_by_date_drops_links_whose_when_is_outside():
+    from app.search.neo4j_query import filter_graph_by_date
+    graph = {
+        "nodes": [
+            {"id": "t", "name": "티원", "label": "Team", "is_seed": True, "degree": 4},
+            {"id": "a", "name": "제우스", "label": "Player", "is_seed": False, "degree": 1},
+            {"id": "b", "name": "도란", "label": "Player", "is_seed": False, "degree": 1},
+            {"id": "c", "name": "페이커", "label": "Player", "is_seed": False, "degree": 1},
+            {"id": "l", "name": "LCK", "label": "League", "is_seed": False, "degree": 1},
+        ],
+        "links": [
+            {"source": "a", "target": "t", "type": "MEMBER_OF", "evidence": None, "when": [["2024-01-01", "2024-12-01"]]},
+            {"source": "b", "target": "t", "type": "MEMBER_OF", "evidence": None, "when": [["2025-01-01", None]]},
+            {"source": "c", "target": "t", "type": "MEMBER_OF", "evidence": None, "when": [["2023-01-01", None]]},
+            {"source": "t", "target": "l", "type": "COMPETES_IN", "evidence": None, "when": None},
+        ],
+    }
+    facts = [
+        {"source": "제우스", "relation": "MEMBER_OF", "target": "티원"},
+        {"source": "도란", "relation": "MEMBER_OF", "target": "티원"},
+        {"source": "페이커", "relation": "MEMBER_OF", "target": "티원"},
+        {"source": "티원", "relation": "COMPETES_IN", "target": "LCK"},
+    ]
+    g, f = filter_graph_by_date(graph, facts, "2024-01-01", "2024-12-31")
+    # 2025년부터 소속인 도란만 빠진다. 열린 구간(페이커)과 날짜 없는 관계(LCK)는 남는다.
+    assert [n["id"] for n in g["nodes"]] == ["t", "a", "c", "l"]
+    assert [l["source"] for l in g["links"]] == ["a", "c", "t"]
+    assert [x["source"] for x in f] == ["제우스", "페이커", "티원"]
+    assert next(n for n in g["nodes"] if n["id"] == "t")["degree"] == 3
+
+def test_question_date_range_ignores_digits_inside_longer_numbers():
+    assert question_date_range("골드 20000 차이로 이긴 경기") is None
+    assert question_date_range("120250 딜량") is None
+    assert question_date_range("2025년 골드 20000 차이") == ("2025-01-01", "2025-12-31")
+
+
+def test_filter_graph_by_date_drops_isolated_dated_seed_but_keeps_subject_seed():
+    from app.search.neo4j_query import filter_graph_by_date
+    graph = {
+        "nodes": [
+            {"id": "t", "name": "티원", "label": "Team", "is_seed": True, "degree": 0},
+            {"id": "v", "name": "HLE vs T1 하이라이트", "label": "FanVideo", "is_seed": True, "degree": 1},
+            {"id": "c", "name": "댓글", "label": "FanComment", "is_seed": False, "degree": 1},
+        ],
+        "links": [{"source": "v", "target": "c", "type": "HAS_COMMENT", "evidence": None, "when": [["2025-08-15", "2025-08-15"]]}],
+    }
+    g, _ = filter_graph_by_date(graph, [], "2024-01-01", "2024-12-31")
+    assert [n["id"] for n in g["nodes"]] == ["t"]
+
+
+# ---------- 세 경로 동시 실행 ----------
+import threading, time as _time
+
+def test_pipeline_runs_three_branches_concurrently(monkeypatch):
+    """세 경로가 각각 0.3초씩 걸려도 전체는 0.9초가 아니라 0.3초 남짓이어야 한다."""
+    threads = set()
+    def slow(value):
+        def fn(*args, **kwargs):
+            threads.add(threading.get_ident())
+            _time.sleep(0.3)
+            return value
+        return fn
+    monkeypatch.setattr(pipeline, "analyze_question_intent", lambda q: {"intent": "i", "keywords": ["T1"]})
+    monkeypatch.setattr(pipeline, "_search_articles_safe", slow([]))
+    monkeypatch.setattr(pipeline, "search_graph_knowledge", slow({"facts": [], "context": "", "keywords": ["T1"], "graph": {"nodes": [], "links": []}}))
+    monkeypatch.setattr(pipeline, "_search_rdb_safe", slow({"keywords": [], "entities": {"players": [], "teams": []}, "facts": [], "context": "", "sql": None}))
+    monkeypatch.setattr(pipeline, "call_hyperclova_kg_answer", lambda q, c: "kg")
+    monkeypatch.setattr(pipeline, "call_hyperclova_rdb_answer", lambda q, c: "rdb")
+    monkeypatch.setattr(pipeline, "call_hyperclova_merge", lambda q, a, g, r: f"{a}|{g}|{r}")
+    started = _time.perf_counter()
+    r = pipeline.run_pipeline("2025 T1 성적", skip_clarify=True)
+    assert _time.perf_counter() - started < 0.7
+    assert len(threads) == 3
+    assert r["answer"] == "관련 기사를 찾지 못했습니다.|kg|rdb"
+
+def test_pipeline_branch_error_propagates(monkeypatch):
+    def boom(*args, **kwargs):
+        raise RuntimeError("neo4j down")
+    monkeypatch.setattr(pipeline, "analyze_question_intent", lambda q: {"intent": "i", "keywords": ["T1"]})
+    monkeypatch.setattr(pipeline, "_search_articles_safe", lambda q, top_k=3, date_range=None: [])
+    monkeypatch.setattr(pipeline, "search_graph_knowledge", boom)
+    monkeypatch.setattr(pipeline, "_search_rdb_safe", lambda q, kw, graph_limit=40, date_range=None: {"keywords": [], "entities": {"players": [], "teams": []}, "facts": [], "context": "", "sql": None})
+    monkeypatch.setattr(pipeline, "call_hyperclova_rdb_answer", lambda q, c: "rdb")
+    import pytest
+    with pytest.raises(RuntimeError, match="neo4j down"):
+        pipeline.run_pipeline("2025 T1 성적", skip_clarify=True)
+
+def test_pipeline_passes_strategy_focus_to_graph(monkeypatch):
+    seen = {}
+    def graph(kw, limit=100, date_range=None, focus="default"):
+        seen["focus"] = focus
+        return {"facts": [], "context": "", "keywords": kw, "graph": {"nodes": [], "links": []}}
+    monkeypatch.setattr(pipeline, "analyze_question_intent", lambda q: {"intent": "i", "keywords": ["T1"]})
+    monkeypatch.setattr(pipeline, "_search_articles_safe", lambda q, top_k=3, date_range=None: [])
+    monkeypatch.setattr(pipeline, "search_graph_knowledge", graph)
+    monkeypatch.setattr(pipeline, "_search_rdb_safe", lambda q, kw, graph_limit=40, date_range=None: {"keywords": [], "entities": {"players": [], "teams": []}, "facts": [], "context": "", "sql": None})
+    monkeypatch.setattr(pipeline, "call_hyperclova_kg_answer", lambda q, c: "kg")
+    monkeypatch.setattr(pipeline, "call_hyperclova_rdb_answer", lambda q, c: "rdb")
+    monkeypatch.setattr(pipeline, "call_hyperclova_merge", lambda q, a, g, r: "final")
+    pipeline.run_pipeline("2025 T1 전략 알려줘", skip_clarify=True)
+    assert seen["focus"] == "strategy"
+    pipeline.run_pipeline("2025 T1 성적 알려줘", skip_clarify=True)
+    assert seen["focus"] == "default"
