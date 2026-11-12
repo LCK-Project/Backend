@@ -62,6 +62,7 @@ def ask(req: QuestionRequest):
         "graph_facts": result["graph_facts"],
         "kg_keywords": result["kg_keywords"],
         "graph": result["graph"],
+        "timeline": result["timeline"],
         "rdb_entities": result["rdb_entities"],
         "rdb_facts": result["rdb_facts"],
         "rdb_sql": result["rdb_sql"],

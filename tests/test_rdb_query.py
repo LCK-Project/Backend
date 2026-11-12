@@ -66,9 +66,10 @@ def test_schema_prompt_describes_new_tables():
 
 # ---------- 기간 ----------
 
-def test_question_date_range_single_year_only():
+def test_question_date_range_uses_shared_rule():
     assert r.question_date_range("2025년 페이커 평균 KDA") == ("2025-01-01", "2025-12-31")
-    assert r.question_date_range("2024 vs 2025 비교") is None
+    # 연도가 여러 개면 가장 이른 해부터 가장 늦은 해까지다(그래프·기사 검색과 같은 규칙).
+    assert r.question_date_range("2024 vs 2025 비교") == ("2024-01-01", "2025-12-31")
     assert r.question_date_range("페이커 KDA") is None
 
 def test_range_label():
